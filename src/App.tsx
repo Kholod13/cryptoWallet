@@ -1,12 +1,10 @@
 import './App.css'
-
+import Dashboard from "./pages/Dashboard.tsx";
 function App() {
 
   return (
     <>
-      <p className="font-bold">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Dashboard />
     </>
   )
 }
