@@ -1,9 +1,44 @@
+import {Search, Bell, Trophy} from 'lucide-react';
+import userImage from "../../assets/user_image/image.png";
+import {Link} from "react-router-dom";
 
+interface HeaderProps {
+    title: string
+}
 
-export const Header = () => {
+export const Header = ({title}: HeaderProps) => {
+
     return (
-        <header className="header">
-            <h3>Header</h3>
+        <header className="flex p-7 pt-6 justify-between items-center bg-gray-200">
+            {/* Title */}
+            <p className="text-slate-600 font-bold text-2xl w-1/8">{title}</p>
+            {/* Input */}
+            <div className="flex bg-gray-300 p-4 gap-5 rounded-xl w-1/3">
+                <Search />
+                <input type="text" placeholder="Search here"
+                className="border-none outline-none focus:ring-0 text-gray-600 w-full"/>
+            </div>
+            {/* Message buttons */}
+            <div className="flex items-center gap-5">
+                <button className="border-2 p-3 rounded-xl border-[#362F5E] hover:bg-gray-300
+                active:border:bg-[#362F5E] transition-all duration-300">
+                    <Bell />
+                </button>
+                <button className="border-2 p-3 rounded-xl border-[#362F5E] hover:bg-gray-300
+                active:border:bg-[#362F5E] transition-all duration-300">
+                    <Trophy />
+                </button>
+            </div>
+            {/* Profile info */}
+            <div className="flex items-center gap-5 px-5 h-full">
+                <Link to="/settings" className="w-56p h-56p cursor-pointer">
+                    <img className="w-full h-full" src={userImage} alt="your_image"/>
+                </Link>
+                <div className="py-8p">
+                    <p className="font-bold text-xl">Johndoe</p>
+                    <p className="text-gray-500 text-sm">Super Admin</p>
+                </div>
+            </div>
         </header>
     )
 }
