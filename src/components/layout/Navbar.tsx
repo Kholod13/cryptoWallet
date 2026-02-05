@@ -2,6 +2,8 @@ import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Wallet, History, Settings } from 'lucide-react';
 import logo from '../../assets/logo.svg';
 import codeBy from '../../assets/codeBy.png';
+import {useDispatch} from "react-redux"; // redux
+import {setPageTitle} from "../../store/slices/uiSlice.ts"; //redux
 
 // Pages list
 const NAV_ITEMS = [
@@ -12,8 +14,11 @@ const NAV_ITEMS = [
 ];
 
 export const Navbar = () => {
+
+    const dispatch = useDispatch();
+
     return (
-        <nav className="flex flex-col p-4 h-screen">
+        <nav className="flex flex-col p-4 h-screen overflow-hidden">
             {/* Flex block for (h-screen/flex-1) */}
             <div className="flex flex-col flex-1">
                 {/* Logotype */}
@@ -27,6 +32,7 @@ export const Navbar = () => {
                         <li key={item.id}>
                             <NavLink
                                 to={item.path}
+                                onClick={() => dispatch(setPageTitle(item.label))}
                                 className={({ isActive }) => `
                                     flex font-bold items-center gap-3 px-5 py-6 rounded-lg transition-all duration-800
                                     ${isActive ? 'bg-[#362F5E] text-white shadow-lg shadow-blue-900/20'
@@ -42,7 +48,7 @@ export const Navbar = () => {
 
             </div>
             {/* Footer of navigation / text: no copyrighted */}
-            <div className="flex flex-col items-center gap-8 px-2 ml-2 mr-2 mt-2 mb-5 bg-gray-400
+            <div className="flex flex-col items-center gap-8 px-2 ml-2 mr-2 mt-5 mb-5 bg-gray-400
             p-6 rounded-xl">
                 <img src={codeBy} alt="code_icon" className="w-40 h-40" />
                 <p className="font-bold text-wrap text-sm text-gray-600 text-center">© 2026 Code by Vladyslav K.</p>

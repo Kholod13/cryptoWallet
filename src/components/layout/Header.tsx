@@ -1,12 +1,12 @@
 import {Search, Bell, Trophy} from 'lucide-react';
 import userImage from "../../assets/user_image/image.png";
 import {Link} from "react-router-dom";
+import {useSelector} from "react-redux"; //redux
+import {type RootState} from '../../store/' //redux
 
-interface HeaderProps {
-    title: string
-}
+export const Header = () => {
 
-export const Header = ({title}: HeaderProps) => {
+    const title = useSelector((state: RootState) => state.ui.pageTitle); // redux title
 
     return (
         <header className="flex p-7 pt-6 justify-between items-center bg-gray-200">
@@ -31,8 +31,10 @@ export const Header = ({title}: HeaderProps) => {
             </div>
             {/* Profile info */}
             <div className="flex items-center gap-5 px-5 h-full">
-                <Link to="/settings" className="w-56p h-56p cursor-pointer">
-                    <img className="w-full h-full" src={userImage} alt="your_image"/>
+                <Link to="/settings" className="cursor-pointer">
+                    <div className="flex items-center justify-center overflow-hidden w-[50px] h-[50px] rounded-xl">
+                        <img className="w-full h-full" src={userImage} alt="your_image"/>
+                    </div>
                 </Link>
                 <div className="py-8p">
                     <p className="font-bold text-xl">Johndoe</p>
