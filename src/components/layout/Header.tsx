@@ -1,12 +1,12 @@
 import {Search, Bell, Trophy} from 'lucide-react';
-import userImage from "../../assets/user_image/image.png";
 import {Link} from "react-router-dom";
 import {useSelector} from "react-redux"; //redux
-import {type RootState} from '../../store/' //redux
+import {type RootState, useAppSelector} from '../../store/' //redux
 
 export const Header = () => {
 
     const title = useSelector((state: RootState) => state.ui.pageTitle); // redux title
+    const {username, profession, avatarUrl} = useAppSelector((state) => state.user);
 
     return (
         <header className="flex p-7 pt-6 justify-between items-center bg-gray-200">
@@ -33,12 +33,12 @@ export const Header = () => {
             <div className="flex items-center gap-5 px-5 h-full">
                 <Link to="/settings" className="cursor-pointer">
                     <div className="flex items-center justify-center overflow-hidden w-[50px] h-[50px] rounded-xl">
-                        <img className="w-full h-full" src={userImage} alt="your_image"/>
+                        <img className="w-full h-full" src={avatarUrl} alt="your_image"/>
                     </div>
                 </Link>
                 <div className="py-8p">
-                    <p className="font-bold text-xl">Johndoe</p>
-                    <p className="text-gray-500 text-sm">Super Admin</p>
+                    <p className="font-bold text-xl">{username}</p>
+                    <p className="text-gray-500 text-sm flex justify-center">{profession}</p>
                 </div>
             </div>
         </header>
