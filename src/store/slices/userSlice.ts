@@ -29,8 +29,12 @@ const userSlice = createSlice({
 
             return newState;
         },
+        logoutUser: () => {
+            localStorage.removeItem('crypto_user');
+            return initialState;
+        }
     },
 });
 
-export const { updateUser } = userSlice.actions;
+export const { updateUser, logoutUser } = userSlice.actions;
 export default userSlice.reducer;

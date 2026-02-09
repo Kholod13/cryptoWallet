@@ -51,7 +51,7 @@ export const Navbar = () => {
             <div className="flex flex-col items-center gap-8 px-2 ml-2 mr-2 mt-5 mb-5 bg-gray-400
             p-6 rounded-xl">
                 <img src={codeBy} alt="code_icon" className="w-40 h-40" />
-                <p className="font-bold text-wrap text-sm text-gray-600 text-center">© 2026 Code by Vladyslav K.</p>
+                <p className="font-bold text-wrap text-sm text-gray-600 text-center">© 2026 Code by Vladyslav Kh.</p>
             </div>
 
         </nav>

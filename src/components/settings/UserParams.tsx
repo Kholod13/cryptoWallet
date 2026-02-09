@@ -2,49 +2,55 @@ import React, { useState, useRef } from 'react';
 import { UserRoundIcon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store'; // Твои типизированные хуки
 import { updateUser } from '../../store/slices/userSlice';
+//toast
+import {addToast} from '../../store/slices/toastSlice'
 
 export const UserParams = () => {
     const dispatch = useAppDispatch();
-    // Берем текущие данные из Redux для инициализации
     const userData = useAppSelector((state) => state.user);
 
-    // Локальный стейт для формы
+    // local state for form
     const [name, setName] = useState(userData.username);
     const [profession, setProfession] = useState(userData.profession);
     const [tempAvatar, setTempAvatar] = useState(userData.avatarUrl);
 
-    // Реф для скрытого инпута файла
+    // ref for hide input Choose file
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Функция для вызова выбора файла
+    // Function for call 'choose file'
     const handleChooseFile = () => {
         fileInputRef.current?.click();
     };
 
-    // Обработка выбора картинки
+    // Processing to choose image
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
 
-            // Когда файл прочитан, превращаем его в строку и кладем в стейт
+            // When file was read, convert it to string for saving
             reader.onloadend = () => {
                 const base64String = reader.result as string;
-                setTempAvatar(base64String); // Теперь это длинный текст, который можно сохранить
+                setTempAvatar(base64String); // This one we can save
             };
 
             reader.readAsDataURL(file);
         }
     };
 
-    // Сохранение в Redux
+    // Save to Redux
     const handleSave = () => {
+        //update data
         dispatch(updateUser({
             username: name,
             profession: profession,
             avatarUrl: tempAvatar
         }));
-        alert("Profile updated!");
+        //toast
+        dispatch(addToast({
+            message: 'Profile successfully updated',
+            type: 'success'
+        }))
     };
 
     return (
@@ -70,7 +76,7 @@ export const UserParams = () => {
                         )}
                     </div>
 
-                    {/* СКРЫТЫЙ ИНПУТ */}
+                    {/* Hidden input */}
                     <input
                         type="file"
                         ref={fileInputRef}
@@ -79,7 +85,7 @@ export const UserParams = () => {
                         className="hidden"
                     />
 
-                    {/* КНОПКА ВМЕСТО ИНПУТА */}
+                    {/* button instead of input */}
                     <button
                         onClick={handleChooseFile}
                         className="bg-[#362F5E] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#4a4080] transition-colors"

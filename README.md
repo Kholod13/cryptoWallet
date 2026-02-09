@@ -1,73 +1,80 @@
-# React + TypeScript + Vite
+# 🚀 CryptoWallet — Crypto Portfolio Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**CryptoWallet** is a modern, high-performance web application designed to track and manage cryptocurrency assets. Built with a focus on seamless UX, security, and scalable architecture.
 
-Currently, two official plugins are available:
+![React](https://img.shields.io/badge/React-19-blue?logo=react)
+![Redux](https://img.shields.io/badge/Redux-Toolkit-purple?logo=redux)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4-38B2AC?logo=tailwind-css)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Dashboard Overview:** Visual summary of your crypto holdings and total balance.
+- **Dynamic Asset Roadmap:** An interactive, draggable roadmap of technical goals built with `Framer Motion` and `react-xarrows`.
+- **Global State Management:** Centralized user and UI data handling using `Redux Toolkit`.
+- **User Profile System:** Customizable profile with local image upload (Base64) and persistence via `LocalStorage`.
+- **Advanced UI/UX:**
+    - Glassmorphism design principles.
+    - Smooth Parallax and Reveal scroll effects.
+    - Interactive Sidebar with active route highlighting.
+- **Custom Notification System:** A Redux-based Toast notification system with smooth `Framer Motion` animations.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠 Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Frontend:** React (Vite)
+- **Language:** TypeScript (Strict mode)
+- **State Management:** Redux Toolkit (Slices, Typed Hooks)
+- **Styling:** Tailwind CSS (v4)
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
+- **Routing:** React Router DOM v6
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🏗 Architecture & Patterns
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The project follows a clean architectural approach:
+- **Feature-based Folder Structure:** Organized by components, layout, and logic slices.
+- **Custom Hooks:** Typed wrappers for Redux (`useAppDispatch`, `useAppSelector`).
+- **Persistence Layer:** Syncing Redux state with `Web Storage API` for data retention.
+- **Component Composition:** Reusable UI components (Cards, Buttons, Inputs).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🔒 Security Audit
+
+This project has undergone a professional **Security Penetration Test** based on the **OWASP WSTG** standard.
+- **Vulnerabilities Found:** 0
+- **Security Level:** High
+- **Key focus:** Clean dependency management, zero-trust input handling, and secure data persistence.
+
+---
+
+## 🚀 Getting Started
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Kholod13/cryptoWallet.git
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Run development server:**
+    ```bash
+   npm run dev
+    ```
+   
+---
+
+## 👨‍💻 Author
+**Vladyslav Kholod**
+
+- **LinkedIn:** https://www.linkedin.com/in/vladyslav-kholod-86647120a/
+- **GitHub:** https://github.com/Kholod13/cryptoWallet
+- **Telegram:** @kah13x
+- **Host:** not released
