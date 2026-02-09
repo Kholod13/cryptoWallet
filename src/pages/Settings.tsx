@@ -1,6 +1,8 @@
 import UserParams from '../components/settings/UserParams';
 import Logout from '../components/settings/Logout';
+import Contact from '../components/settings/Contact';
 import {useAppSelector} from "../store";
+import AppProperties from "../components/settings/AppProperties.tsx";
 
 const Settings = () => {
 
@@ -9,9 +11,11 @@ const Settings = () => {
     return (
         <div className='flex flex-col gap-6'>
             <UserParams key={userName} />
-            <div className='flex'>
+            <div className='flex gap-6'>
+                <AppProperties/>
                 <Logout />
             </div>
+            <Contact />
         </div>
     )
 }

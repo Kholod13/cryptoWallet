@@ -9,7 +9,7 @@ export const Header = () => {
     const {username, profession, avatarUrl} = useAppSelector((state) => state.user);
 
     return (
-        <header className="flex p-7 pt-6 justify-between items-center bg-gray-200">
+        <header className="flex p-7 pt-6 justify-between items-center bg-gray-100">
             {/* Title */}
             <p className="text-slate-600 font-bold text-2xl w-1/8">{title}</p>
             {/* Input */}

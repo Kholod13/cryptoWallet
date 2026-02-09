@@ -8,7 +8,7 @@ export const Logout = () => {
 
     return (
         <NavLink to={'/dashboard'} onClick={() => dispatch(logoutUser())}
-        className='inline-block text-center text-white font-bold rounded-xl cursor-pointer flex-col bg-[#362F5E] p-9
+        className=' inline-block text-center text-white font-bold rounded-xl cursor-pointer flex-col bg-[#362F5E] p-9 h-max
         hover:bg-[#4a4080] transition-colors'>
             <SquareArrowOutUpRight color='white' size={80}/>
             <p>Log Out</p>
