@@ -8,7 +8,7 @@ import {ToastContainer} from "./components/ui/ToastContainer.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Provider store={store}> {/* Чтобы все приложение видело Redux */}
+    <Provider store={store}>
         <ToastContainer />
         <App />
     </Provider>
