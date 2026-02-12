@@ -1,9 +1,10 @@
+import CoinMarket from "../components/dashboard/CoinMarket.tsx";
 
 const Dashboard = () => {
 
     return (
         <div className="flex flex-1">
-            <h1>Dashboard</h1>
+            <CoinMarket />
 
         </div>
     )
