@@ -3,6 +3,8 @@ import uiReducer from './slices/uiSlice';
 import userReducer from './slices/userSlice';
 import toastReducer from './slices/toastSlice';
 import marketReducer from './slices/marketSlice';
+import walletReducer from './slices/walletSlice';
+
 import {type TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 
 export const store = configureStore({
@@ -11,6 +13,7 @@ export const store = configureStore({
         user: userReducer,
         toast: toastReducer,
         market: marketReducer,
+        wallet: walletReducer,
     }
 })
 

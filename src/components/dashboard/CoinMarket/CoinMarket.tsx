@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store';
-import { fetchCoins } from '../../store/slices/marketSlice';
+import { useAppDispatch, useAppSelector } from '../../../store';
+import { fetchCoins } from '../../../store/slices/marketSlice.ts';
 import {TrendingUp, TrendingDown, AreaChart as ChartIcon, RefreshCcw} from 'lucide-react';
 import { AnimatePresence, motion } from "framer-motion";
 import { CoinChartModal } from "./CoinChartModel.tsx";
@@ -11,21 +11,22 @@ const CoinMarket = () => {
     const { coins, isLoading, error } = useAppSelector((state) => state.market);
     const [selectedCoin, setSelectedCoin] = useState<any | null>(null);
     const [rotation, setRotation] = useState(0);
+    const { mainCurrency } = useAppSelector(state => state.user);
 
     const handleRefreshButton = () => {
         setRotation(prev => prev + 360);
 
-        dispatch(fetchCoins());
+        dispatch(fetchCoins(mainCurrency));
     }
 
     useEffect(() => {
-        dispatch(fetchCoins());
+        dispatch(fetchCoins(mainCurrency));
     }, [dispatch]);
 
     if (error) return <div className="text-red-500 p-10 font-bold text-center">Error: {error}</div>;
 
     return (
-        <div className="flex flex-col flex-1 gap-6 p-2">
+        <div className="flex flex-col flex-1 gap-6 max-w-1/3">
             {/* Coins table */}
             <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
                 <table className="w-full text-left border-collapse">
@@ -36,7 +37,6 @@ const CoinMarket = () => {
                                 onClick={handleRefreshButton}
                                 className="text-sm bg-white px-4 py-2 rounded-lg shadow-sm hover:bg-slate-50 transition-colors border border-slate-200 cursor-pointer"
                             >
-                                {/* 3. Оборачиваем иконку в motion.div */}
                                 <motion.div
                                     animate={{ rotate: rotation }}
                                     transition={{ duration: 0.6, ease: "easeInOut" }}
