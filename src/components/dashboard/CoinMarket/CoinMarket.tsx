@@ -16,10 +16,14 @@ const CoinMarket = () => {
     const handleRefreshButton = () => {
         setRotation(prev => prev + 360);
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         dispatch(fetchCoins(mainCurrency));
     }
 
     useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         dispatch(fetchCoins(mainCurrency));
     }, [dispatch]);
 

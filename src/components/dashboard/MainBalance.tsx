@@ -7,16 +7,23 @@ export const MainBalance = () => {
     const [isVisible, setIsVisible] = React.useState(true);
 
     const { myAssets } = useAppSelector((state) => state.wallet);
-    const { coins } = useAppSelector((state) => state.market);
+    const { coins, fiatRates } = useAppSelector((state) => state.market);
     const { mainCurrency } = useAppSelector((state) => state.user);
 
     const totalBalance = useMemo(() => {
-        return myAssets.reduce((acc, asset) => {
-            const coinInfo = coins.find(c => c.id === asset.id);
-            const price = coinInfo?.current_price || 0;
-            return acc + (asset.amount * price);
+        // 1. Считаем всё сначала в USD
+        const totalUSD = myAssets.reduce((acc, asset) => {
+            // ВАЖНО: В CoinLore id может быть числом "90",
+            // проверь, чтобы asset.id совпадал с тем, что присылает API
+            const coinInfo = coins.find(c => c.symbol.toLowerCase() === asset.symbol.toLowerCase());
+            const priceUSD = coinInfo?.current_price || 0;
+            return acc + (asset.amount * priceUSD);
         }, 0);
-    }, [myAssets, coins]);
+
+        // 2. Умножаем на курс выбранной валюты
+        const rate = fiatRates[mainCurrency] || 1;
+        return totalUSD * rate;
+    }, [myAssets, coins, fiatRates, mainCurrency]);
 
     return (
         <motion.div

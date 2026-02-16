@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// coin type(based on Coingecko)
 export interface Coin {
     id: string;
     symbol: string;
@@ -18,30 +17,52 @@ interface MarketState {
     error: string | null;
 }
 
+export const fetchFiatRates = createAsyncThunk('market/fetchFiatRates', async () => {
+    const response = await fetch('https://open.er-api.com/v6/latest/USD');
+    const json = await response.json();
+    return json.rates; // Вернет объект типа { "CZK": 23.5, "EUR": 0.92, ... }
+});
+
+interface MarketState {
+    coins: Coin[];
+    fiatRates: Record<string, number>; // Добавили сюда
+    isLoading: boolean;
+    error: string | null;
+}
+
 const initialState: MarketState = {
     coins: [],
+    fiatRates: { USD: 1 }, // По умолчанию 1 к 1
     isLoading: false,
     error: null,
 };
 
-// async fetch to CoinGecko
+
+// Асинхронный запрос к CoinLore
 export const fetchCoins = createAsyncThunk(
     'market/fetchCoins',
-    async (currency: string = 'usd') => { // Добавь = 'usd' здесь как запасной вариант
-        const apiKey = import.meta.env.VITE_COINGECKO_API_KEY;
-        const activeCurrency = (currency || 'usd').toLowerCase();
+    async () => {
+        // CoinLore не требует ключа!
+        // Лимит: 10 монет (можно увеличить до 50)
+        const response = await fetch('https://api.coinlore.net/api/tickers/?start=0&limit=10');
 
-        const response = await fetch(
-            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${activeCurrency}&order=market_cap_desc&per_page=10&page=1&sparkline=false`,
-            {
-                headers: {
-                    'accept': 'application/json',
-                    'x-cg-demo-api-key': apiKey
-                }
-            }
-        );
-        if (!response.ok) throw new Error('Server error');
-        return await response.json();
+        if (!response.ok) throw new Error('CoinLore server error');
+
+        const json = await response.json();
+
+        // Преобразуем данные из формата CoinLore в наш формат Coin
+        // Т.к. CoinLore отдает всё строками, используем parseFloat
+        return json.data.map((coin: any) => ({
+            id: coin.nameid,
+            symbol: coin.symbol,
+            name: coin.name,
+            // Генерируем ссылку на иконку через сторонний сервис (т.к. в API её нет)
+            image: `https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`,
+            current_price: parseFloat(coin.price_usd),
+            market_cap: parseFloat(coin.market_cap_usd),
+            market_cap_rank: coin.rank,
+            price_change_percentage_24h: parseFloat(coin.percent_change_24h),
+        })) as Coin[];
     }
 );
 
@@ -51,14 +72,20 @@ const marketSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(fetchCoins.pending, (state) => { state.isLoading = true; })
+            .addCase(fetchCoins.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
             .addCase(fetchCoins.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.coins = action.payload;
             })
+            .addCase(fetchFiatRates.fulfilled, (state, action) => {
+                state.fiatRates = action.payload;
+            })
             .addCase(fetchCoins.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message || 'Error';
+                state.error = action.error.message || 'Error loading coins';
             });
     },
 });
