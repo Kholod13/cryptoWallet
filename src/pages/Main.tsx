@@ -2,7 +2,7 @@ import Navbar from '../components/layout/Navbar.tsx'
 import Header from "../components/layout/Header.tsx";
 import { Outlet } from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../store";
-import {fetchCoins, fetchFiatRates} from "../store/slices/marketSlice.ts";
+import {fetchFiatRates} from "../store/slices/marketSlice.ts";
 import {useEffect} from "react";
 
 const Main = () => {
@@ -11,7 +11,6 @@ const Main = () => {
     const { mainCurrency } = useAppSelector(state => state.user);
 
     useEffect(() => {
-        dispatch(fetchCoins(mainCurrency)); // Твой запрос монет
         dispatch(fetchFiatRates());         // Новый запрос курсов валют
     }, [mainCurrency, dispatch]);
 

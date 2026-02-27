@@ -4,7 +4,6 @@ import userReducer from './slices/userSlice';
 import toastReducer from './slices/toastSlice';
 import marketReducer from './slices/marketSlice';
 import walletReducer from './slices/walletSlice';
-import walletsReducer from './slices/arrayWalletsSlice';
 
 import {type TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 
@@ -15,7 +14,6 @@ export const store = configureStore({
         toast: toastReducer,
         market: marketReducer,
         wallet: walletReducer,
-        wallets: walletsReducer, // test for practice
     }
 })
 
