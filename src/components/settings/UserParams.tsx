@@ -1,125 +1,118 @@
-import React, { useState, useRef } from 'react';
-import { UserRoundIcon } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '../../store'; // Твои типизированные хуки
-import { updateUser } from '../../store/slices/userSlice';
-//toast
-import {addToast} from '../../store/slices/toastSlice'
+import React, { useState, useRef, useEffect } from 'react';
+import { UserRoundIcon, Check } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { addToast } from '../../store/slices/toastSlice';
+import {resetStatus, updateProfile} from "../../store/slices/authSlice";
 
 export const UserParams = () => {
     const dispatch = useAppDispatch();
-    const userData = useAppSelector((state) => state.user);
 
-    // local state for form
-    const [name, setName] = useState(userData.username);
-    const [profession, setProfession] = useState(userData.profession);
-    const [tempAvatar, setTempAvatar] = useState(userData.avatarUrl);
+    // 1. ИСПРАВЛЕНО: берем данные из auth.user (так как мы объединили слайсы)
+    const user = useAppSelector((state) => state.auth.user);
+    const { isLoading } = useAppSelector((state) => state.auth);
 
-    // ref for hide input Choose file
+    const [name, setName] = useState(user?.username || '');
+    const [profession, setProfession] = useState(user?.profession || '');
+    const [tempAvatar, setTempAvatar] = useState(user?.avatarUrl || '');
+
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Function for call 'choose file'
-    const handleChooseFile = () => {
-        fileInputRef.current?.click();
-    };
+    // 2. ДОБАВЛЕНО: Синхронизация полей, когда данные приходят с бэкенда
+    useEffect(() => {
+        if (user) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setName(user.username);
+            setProfession(user.profession || '');
+            setTempAvatar(user.avatarUrl || '');
+        }
+    }, [user]);
+    useEffect(() => {
+        // Эта функция сработает, когда пользователь уходит со страницы Settings
+        return () => {
+            dispatch(resetStatus());
+        };
+    }, [dispatch]);
 
-    // Processing to choose image
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                dispatch(addToast({ message: 'Image is too large (max 2MB)', type: 'error' }));
+                return;
+            }
             const reader = new FileReader();
-
-            // When file was read, convert it to string for saving
             reader.onloadend = () => {
-                const base64String = reader.result as string;
-                setTempAvatar(base64String); // This one we can save
+                setTempAvatar(reader.result as string);
             };
-
             reader.readAsDataURL(file);
         }
     };
 
-    // Save to Redux
-    const handleSave = () => {
-        //update data
-        dispatch(updateUser({
+    const handleSave = async () => {
+        // 3. ИСПРАВЛЕНО: Диспатчим и ждем результата для тостера
+        const resultAction = await dispatch(updateProfile({
             username: name,
             profession: profession,
             avatarUrl: tempAvatar
         }));
-        //toast
-        dispatch(addToast({
-            message: 'Profile successfully updated',
-            type: 'success'
-        }))
+
+        // Проверяем, успешно ли прошел асинхронный экшен
+        if (updateProfile.fulfilled.match(resultAction)) {
+            dispatch(addToast({
+                message: 'Profile updated in database!',
+                type: 'success'
+            }));
+        } else {
+            dispatch(addToast({
+                message: 'Error updating profile',
+                type: 'error'
+            }));
+        }
     };
 
     return (
-        <div className="flex flex-col bg-gray-500 p-3 rounded-xl gap-3">
-            <div className="flex justify-between items-center">
-                <p className="font-bold text-white text-xl">Set user information</p>
-
+        <div className="flex flex-col bg-gray-500 p-5 rounded-2xl gap-6 shadow-inner">
+            <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                <p className="font-bold text-white text-xl tracking-tight">Personal Information</p>
                 <button
                     onClick={handleSave}
-                    className="bg-emerald-400 hover:bg-emerald-600 text-slate-900 font-bold py-2 px-6 rounded-lg transition-all duration-200 active:scale-95 shadow-md hover:shadow-lg"
+                    disabled={isLoading}
+                    className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold py-2.5 px-8 rounded-xl transition-all duration-200 active:scale-95 shadow-lg cursor-pointer disabled:opacity-50"
                 >
-                    Save
+                    <Check size={18} />
+                    {isLoading ? 'Saving...' : 'Save Changes'}
                 </button>
             </div>
-            <div className="flex justify-around  mb-4">
-                {/* Image */}
-                <div className="flex gap-5 items-center">
-                    <div className="flex items-center justify-center w-25 h-25 bg-gray-400 rounded-xl overflow-hidden border-2 border-slate-700">
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                {/* Image Section */}
+                <div className="flex flex-col items-center gap-3">
+                    <div className="relative group flex items-center justify-center w-28 h-28 bg-gray-400 rounded-3xl overflow-hidden border-4 border-slate-600 shadow-xl">
                         {tempAvatar ? (
                             <img src={tempAvatar} alt="preview" className="w-full h-full object-cover" />
                         ) : (
-                            <UserRoundIcon size={50} />
+                            <UserRoundIcon size={50} className="text-slate-300" />
                         )}
                     </div>
-
-                    {/* Hidden input */}
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        accept="image/*"
-                        className="hidden"
-                    />
-
-                    {/* button instead of input */}
-                    <button
-                        onClick={handleChooseFile}
-                        className="bg-[#362F5E] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#4a4080] transition-colors"
-                    >
-                        Choose file
+                    <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                    <button onClick={() => fileInputRef.current?.click()} className="text-xs font-bold text-blue-300 hover:text-white transition-colors cursor-pointer uppercase tracking-wider">
+                        Change Photo
                     </button>
                 </div>
 
-                {/* Username */}
-                <div>
-                    <p className="font-bold text-white text-lg px-1 pt-1">Username</p>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Username"
-                        className='bg-gray-400 rounded-xl border-[#362F5E] p-2 hover:outline-2 outline-gray-700 focus:outline-2 outline-gray-700 transition-all duration-200 shadow-md outline-none'
-                    />
+                {/* Inputs */}
+                <div className="flex flex-col gap-2">
+                    <label className="text-white text-sm font-bold opacity-70 ml-1">Username</label>
+                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="bg-gray-400 rounded-xl border-2 border-transparent focus:border-[#362F5E] p-3 text-white outline-none transition-all shadow-md" />
                 </div>
 
-                {/* Profession */}
-                <div>
-                    <p className="font-bold text-white text-lg px-1 pt-1">Profession</p>
-                    <input
-                        type="text"
-                        value={profession}
-                        onChange={(e) => setProfession(e.target.value)}
-                        placeholder="Profession"
-                        className='bg-gray-400 rounded-xl border-[#362F5E] p-2 hover:outline-2 outline-gray-700 focus:outline-2 outline-gray-700 transition-all duration-200 shadow-md outline-none'
-                    />
+                <div className="flex flex-col gap-2">
+                    <label className="text-white text-sm font-bold opacity-70 ml-1">Profession</label>
+                    <input type="text" value={profession} onChange={(e) => setProfession(e.target.value)} className="bg-gray-400 rounded-xl border-2 border-transparent focus:border-[#362F5E] p-3 text-white outline-none transition-all shadow-md" />
                 </div>
             </div>
         </div>
     );
-}
+};
 
 export default UserParams;

@@ -6,11 +6,11 @@ import AppProperties from "../components/settings/AppProperties.tsx";
 
 const Settings = () => {
 
-    const userName = useAppSelector(state => state.user.username);
+    const username = useAppSelector(state => state.user.username);
 
     return (
         <div className='flex flex-col gap-8'>
-            <UserParams key={userName} />
+            <UserParams key={username} />
             <div className='flex gap-6'>
                 <Contact />
                 <AppProperties/>

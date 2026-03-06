@@ -4,6 +4,7 @@ import userReducer from './slices/userSlice';
 import toastReducer from './slices/toastSlice';
 import marketReducer from './slices/marketSlice';
 import walletReducer from './slices/walletSlice';
+import authReducer from './slices/authSlice';
 
 import {type TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 
@@ -14,6 +15,7 @@ export const store = configureStore({
         toast: toastReducer,
         market: marketReducer,
         wallet: walletReducer,
+        auth: authReducer,
     }
 })
 

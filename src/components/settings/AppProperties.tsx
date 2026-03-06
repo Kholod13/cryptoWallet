@@ -2,15 +2,20 @@ import { useState } from 'react';
 import { Languages, DollarSign, ChevronDown, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { updateUser } from '../../store/slices/userSlice';
-import {setTheme, setLanguage, type LanguageMode} from '../../store/slices/uiSlice';
+// Используем Thunk для синхронизации с базой
+import { updateProfile } from '../../store/slices/authSlice';
+import { setTheme, setLanguage, type LanguageMode } from '../../store/slices/uiSlice';
 
 export const AppProperties = () => {
     const dispatch = useAppDispatch();
-    const { mainCurrency } = useAppSelector((state) => state.user);
-    const { theme } = useAppSelector((state) => state.ui);
 
-    // Local state for opening lists
+    // 1. Правильно достаем данные
+    const user = useAppSelector((state) => state.auth.user);
+    const { theme, language } = useAppSelector((state) => state.ui);
+
+    // Безопасные переменные (защита от null)
+    const mainCurrency = user?.mainCurrency || 'USD';
+
     const [langOpen, setLangOpen] = useState(false);
     const [currencyOpen, setCurrencyOpen] = useState(false);
 
@@ -20,26 +25,22 @@ export const AppProperties = () => {
         { code: 'CZ', name: 'Čeština' },
         { code: 'UA', name: 'Українська' }
     ];
-    const { language } = useAppSelector((state) => state.ui);
 
     return (
         <div className='flex gap-4 h-max bg-slate-800/50 backdrop-blur-md p-4 rounded-3xl border border-white/10'>
 
-            {/* Language select */}
+            {/* Language Select */}
             <div className="relative">
                 <button
                     onClick={() => {setLangOpen(!langOpen); setCurrencyOpen(false)}}
-                    className={`flex items-center gap-3 px-5 py-4 rounded-2xl transition-all ${
+                    className={`flex items-center gap-3 px-5 py-4 rounded-2xl transition-all cursor-pointer ${
                         langOpen ? 'bg-[#362F5E] text-white' : 'bg-slate-900 text-slate-400 hover:text-white'
                     }`}
                 >
                     <div className="bg-blue-500/20 text-blue-400 p-1 rounded-md">
                         <Languages size={18}/>
                     </div>
-
-                    {/* Showing current language */}
                     <span className="font-bold uppercase">{language}</span>
-
                     <ChevronDown size={16} className={`transition-transform ${langOpen ? 'rotate-180' : ''}`} />
                 </button>
 
@@ -63,7 +64,6 @@ export const AppProperties = () => {
                                     }}
                                 >
                                     <span>{lang.name}</span>
-                                    {/* language icon in list option */}
                                     <span className="text-[10px] opacity-50">{lang.code}</span>
                                 </div>
                             ))}
@@ -72,7 +72,7 @@ export const AppProperties = () => {
                 </AnimatePresence>
             </div>
 
-            {/* Theme swithcer */}
+            {/* Theme Switcher */}
             <div className="flex items-center bg-slate-900 p-1.5 rounded-2xl border border-white/5">
                 <div
                     onClick={() => dispatch(setTheme('light'))}
@@ -88,15 +88,18 @@ export const AppProperties = () => {
                 </div>
             </div>
 
-            {/* Currency select */}
+            {/* Currency Select */}
             <div className="relative">
                 <button
                     onClick={() => {setCurrencyOpen(!currencyOpen); setLangOpen(false)}}
-                    className={`flex items-center gap-3 px-5 py-4 rounded-2xl transition-all ${currencyOpen ? 'bg-[#362F5E] text-white' : 'bg-slate-900 text-slate-400 hover:text-white'}`}
+                    className={`flex items-center gap-3 px-5 py-4 rounded-2xl transition-all cursor-pointer ${
+                        currencyOpen ? 'bg-[#362F5E] text-white' : 'bg-slate-900 text-slate-400 hover:text-white'
+                    }`}
                 >
                     <div className="bg-emerald-500/20 text-emerald-400 p-1 rounded-md">
                         <DollarSign size={18}/>
                     </div>
+                    {/* Показываем валюту из базы */}
                     <span className="font-bold">{mainCurrency}</span>
                     <ChevronDown size={16} className={`transition-transform ${currencyOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -112,9 +115,12 @@ export const AppProperties = () => {
                             {currencies.map((curr) => (
                                 <div
                                     key={curr}
-                                    className={`px-4 py-3 cursor-pointer text-sm transition-colors ${mainCurrency === curr ? 'bg-emerald-500 text-slate-900 font-bold' : 'text-white hover:bg-slate-800'}`}
+                                    className={`px-4 py-3 cursor-pointer text-sm transition-colors ${
+                                        mainCurrency === curr ? 'bg-emerald-500 text-slate-900 font-bold' : 'text-white hover:bg-slate-800'
+                                    }`}
                                     onClick={() => {
-                                        dispatch(updateUser({ mainCurrency: curr }));
+                                        // ВАЖНО: диспатчим Thunk обновления профиля
+                                        dispatch(updateProfile({ mainCurrency: curr }));
                                         setCurrencyOpen(false);
                                     }}
                                 >

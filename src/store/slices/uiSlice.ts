@@ -16,7 +16,7 @@ const savedLang = localStorage.getItem('app_lang') as LanguageMode;
 
 const initialState: UIState = {
     pageTitle: 'Dashboard',
-    theme: savedTheme || 'dark',
+    theme: savedTheme || 'light',
     language: savedLang || 'EN', // default
 }
 

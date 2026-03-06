@@ -15,7 +15,7 @@ const prisma = new PrismaClient({ adapter });
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
-app.use(cors());
+app.use(cors({origin: 'http://localhost:5173'}));
 app.use(express.json());
 
 // Простой ответ на главной странице http://localhost:5000
@@ -98,6 +98,55 @@ app.post('/api/auth/login', async (req, res) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+// --- ПОЛУЧЕНИЕ ПРОФИЛЯ (по токену) ---
+app.get('/api/auth/me', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) return res.status(401).json({ message: "No token provided" });
+
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+        const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const { password: _, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
+    } catch (error) {
+        res.status(401).json({ message: "Invalid token" });
+    }
+});
+
+// --- ОБНОВЛЕНИЕ ПРОФИЛЯ ---
+app.patch('/api/user/update', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+
+        // ВАЖНО: Принимаем данные из тела запроса
+        const { username, profession, avatarUrl, mainCurrency } = req.body;
+
+        const updatedUser = await prisma.user.update({
+            where: { id: decoded.userId },
+            data: {
+                username,
+                profession,
+                avatarUrl,
+                mainCurrency // Добавляем обновление валюты
+            }
+        });
+
+        // ОБЯЗАТЕЛЬНО отправляем обновленного юзера назад
+        const { password: _, ...userWithoutPassword } = updatedUser;
+        res.json(userWithoutPassword);
+
+    } catch (error) {
+        console.error("Update error:", error);
+        res.status(500).json({ message: "Failed to update profile" });
     }
 });
 
