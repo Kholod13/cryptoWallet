@@ -1,0 +1,40 @@
+// Настройки подключения
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+// Таблица пользователя
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  email        String   @unique
+  password     String
+  avatarUrl    String?
+  profession   String?
+  mainCurrency String   @default("USD")
+  accounts     Account[] // Связь с кошельками и биржами
+  createdAt    DateTime @default(now())
+}
+
+// Таблица для кошельков и бирж
+model Account {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  type        String   // "web3" (MetaMask), "exchange" (Binance/OKX), "manual"
+  platform    String   // "ethereum", "binance", "okx", "polygon"
+  label       String   // "My MetaMask"
+
+  address     String?  // Для web3 кошельков
+  apiKey      String?  // Для бирж (публичный ключ)
+  apiSecret   String?  // Для бирж (зашифрованный секрет)
+
+  color       String   @default("#362F5E")
+  createdAt   DateTime @default(now())
+}
