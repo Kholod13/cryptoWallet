@@ -71,3 +71,13 @@ select {
     scroll-behavior: auto !important;
   }
 }
+/* Убираем обводку у всех SVG элементов при фокусе */
+path, circle, rect, svg {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Специально для Recharts */
+.recharts-sector:focus {
+  outline: none !important;
+}

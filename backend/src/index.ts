@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+import ccxt from "ccxt";
 
 const app = express();
 
@@ -147,6 +148,37 @@ app.patch('/api/user/update', async (req, res) => {
     } catch (error) {
         console.error("Update error:", error);
         res.status(500).json({ message: "Failed to update profile" });
+    }
+});
+//connect OKX BINANCE
+// Роут для получения балансов с биржи
+app.post('/api/exchange/balances', async (req, res) => {
+    try {
+        const { platform, apiKey, apiSecret, passphrase } = req.body;
+
+        // Инициализация биржи через CCXT
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        const exchange = new ccxt[platform]({
+            apiKey: apiKey,
+            secret: apiSecret,
+            password: platform === 'okx' ? passphrase : undefined, // Только для OKX
+            enableRateLimit: true,
+        });
+
+        const rawBalance = await exchange.fetchBalance();
+
+        // Фильтруем активы, оставляя только те, где баланс > 0
+        const assets = Object.entries(rawBalance.total)
+            .filter(([_, amount]) => (amount as number) > 0)
+            .map(([symbol, amount]) => ({
+                symbol: symbol.toLowerCase(), // Храним в нижнем регистре для сопоставления
+                amount: amount,
+            }));
+
+        res.json({ assets });
+    } catch (error: any) {
+        res.status(500).json({ message: "Exchange connection failed" });
     }
 });
 

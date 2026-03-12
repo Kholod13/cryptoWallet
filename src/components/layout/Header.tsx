@@ -14,7 +14,7 @@ export const Header = () => {
     const tempAvatar = user?.avatarUrl || '';
 
     return (
-        <header className="flex p-7 pt-6 justify-between items-center bg-gray-100">
+        <header className="flex px-6 py-4 justify-between items-center bg-gray-200">
             {/* Title */}
             <p className="text-slate-600 font-bold text-2xl w-1/8">{title}</p>
             {/* Input */}

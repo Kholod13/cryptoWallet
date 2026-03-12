@@ -1,9 +1,9 @@
 import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Wallet, History, Settings } from 'lucide-react';
-import logo from '../../assets/logo.svg';
 import codeBy from '../../assets/codeBy.png';
 import {useDispatch} from "react-redux"; // redux
 import {setPageTitle} from "../../store/slices/uiSlice.ts"; //redux
+import Logo from '../ui/Logo.tsx';
 
 // Pages list
 const NAV_ITEMS = [
@@ -18,14 +18,16 @@ export const Navbar = () => {
     const dispatch = useDispatch();
 
     return (
-        <nav className="flex flex-col p-4 h-screen overflow-hidden">
+        <nav className="flex flex-col p-4 overflow-hidden">
             {/* Flex block for (h-screen/flex-1) */}
             <div className="flex flex-col flex-1">
                 {/* Logotype */}
-                <div className="flex items-center gap-3 px-2 ml-2 mr-2 mt-2 mb-5">
-                    <img src={logo} alt="Logo" className="w-14 h-14" />
-                    <span className="font-bold text-2xl">CryptoWallet</span>
-                </div>
+                <NavLink className="flex items-center gap-2 px-2 mb-10 mt-6" to={'/dashboard'} onClick={() => dispatch(setPageTitle('Dashboard'))}>
+                    <Logo className="w-10 h-10" />
+                    <h1 className="text-[#362f5e] text-2xl font-black tracking-tighter leading-none">
+                        SYNC<span className="text-emerald-400">SPACE</span>
+                    </h1>
+                </NavLink>
                 {/* List of pages array */}
                 <ul className=" flex flex-col gap-3 flex-auto">
                     {NAV_ITEMS.map((item) => (

@@ -6,7 +6,10 @@ import AppProperties from "../components/settings/AppProperties.tsx";
 
 const Settings = () => {
 
-    const username = useAppSelector(state => state.user.username);
+    const user = useAppSelector((state) => state.auth.user);
+
+    // Витягуємо валюту безпечно. Якщо user === null (йде завантаження), ставимо 'USD'
+    const username = user?.username;
 
     return (
         <div className='flex flex-col gap-8'>

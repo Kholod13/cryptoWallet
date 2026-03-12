@@ -5,6 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, User, AlertCircle } from 'lucide-react';
 import '../../App.css'
 import {useNavigate} from "react-router-dom";
+import DataAggregation from "./DataAgregation.tsx";
+import BitcoinFlow from "./BitcoinFlow.tsx";
+import {AnimatedBackgroundText} from "./AnimatedBackgroundText.tsx";
+import Logo from '../../components/ui/Logo';
 
 const AuthPage = () => {
     const dispatch = useAppDispatch();
@@ -60,11 +64,17 @@ const AuthPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0B101B] p-4">
+        <div className="min-h-screen flex items-center justify-center bg-[#0B101B] p-4 relative">
+            <DataAggregation />
+            <BitcoinFlow />
+            <AnimatedBackgroundText/>
             <motion.div
                 layout
-                className="bg-[#161B26] w-full max-w-md p-8 rounded-[32px] shadow-2xl border border-white/5"
+                className="bg-[#161B26] w-full max-w-md p-8 rounded-[32px] shadow-2xl border border-white/5 absolute z-100"
             >
+                <div className="flex items-center justify-center mb-3">
+                    <Logo/>
+                </div>
                 <h2 className="text-3xl font-black text-white mb-2 text-center">
                     {isLogin ? 'Welcome Back' : 'Create Account'}
                 </h2>

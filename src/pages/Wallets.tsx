@@ -1,5 +1,6 @@
 import AddWalletForm from '../components/wallets/AddWalletForm';
 import WalletList from '../components/wallets/WalletList';
+
 const Wallets = () => {
 
     return (

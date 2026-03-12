@@ -1,122 +1,106 @@
 import { useState } from 'react';
-import { Pilcrow, Paintbrush2, Codesandbox, Landmark } from 'lucide-react';
+import { Wallet, Smartphone, Landmark, LayoutGrid } from 'lucide-react';
 import { useAppDispatch } from '../../store';
-import { addWallet } from '../../store/slices/walletSlice';
-import { addToast } from '../../store/slices/toastSlice';
+import {addSource, syncExchangeBalances} from '../../store/slices/walletSlice';
+
+const PLATFORMS = [
+    { id: 'metamask', name: 'MetaMask', type: 'web3', icon: Wallet },
+    { id: 'binance', name: 'Binance', type: 'exchange', icon: Landmark },
+    { id: 'okx', name: 'OKX', type: 'exchange', icon: LayoutGrid },
+    { id: 'trustwallet', name: 'Trust Wallet', type: 'web3', icon: Smartphone },
+];
 
 export const AddWalletForm = () => {
     const dispatch = useAppDispatch();
-
-    // Локальный стейт для полей
     const [name, setName] = useState('');
-    const [address, setAddress] = useState('');
-    const [currency, setCurrency] = useState('');
-    const [selectedColor, setSelectedColor] = useState('#10b981'); // Дефолтный зеленый
+    const [platform, setPlatform] = useState(PLATFORMS[0]);
+    const [apiKey, setApiKey] = useState('');
+    const [apiSecret, setApiSecret] = useState('');
 
-    // Набор красивых цветов для кошельков
-    const colors = [
-        { hex: '#10b981', name: 'Emerald' },
-        { hex: '#3b82f6', name: 'Blue' },
-        { hex: '#f43f5e', name: 'Rose' },
-        { hex: '#f59e0b', name: 'Amber' },
-        { hex: '#8b5cf6', name: 'Purple' },
-        { hex: '#64748b', name: 'Slate' },
-    ];
+    const [passphrase, setPassphrase] = useState('');
 
     const handleSave = () => {
-        if (!name || !address) {
-            dispatch(addToast({ message: "Please fill name and address", type: 'error' }));
-            return;
-        }
-
-        dispatch(addWallet({
-            id: crypto.randomUUID(),
-            label: name,
-            address: address,
-            currency: currency,
-            color: selectedColor,
-            balance: 0,
+        const newId = crypto.randomUUID();
+        dispatch(addSource({
+            id: newId,
+            label: name || platform.name,
+            type: platform.type as any,
+            platform: platform.id as any,
+            apiKey,
+            apiSecret,
+            passphrase,
+            color: '#362F5E',
+            assets: []
         }));
 
-        dispatch(addToast({ message: "Wallet connected!", type: 'success' }));
+        // Если это биржа, сразу запускаем синхронизацию
+        if (platform.type === 'exchange') {
+            dispatch(syncExchangeBalances({
+                id: newId, platform: platform.id, apiKey, apiSecret, passphrase
+            }));
+        }
 
-        // Очистка формы
-        setName(''); setAddress(''); setCurrency('');
+        // Очистка
+        setApiKey('');
+        setApiSecret('');
+        setName('');
+        setPassphrase('');
     };
 
     return (
-        <div className="flex flex-col bg-[#362F5E] rounded-3xl text-white w-full max-w-md p-8 gap-6 shadow-2xl border border-white/10">
-            <p className='text-center font-black text-2xl tracking-tight'>Add New Wallet</p>
+        <div className="bg-[#161B26] p-6 rounded-[32px] text-white w-full max-w-md shadow-2xl border border-white/5">
+            <h3 className="text-xl font-bold mb-6">Connect Source</h3>
 
-            <div className="flex flex-col gap-5">
-                {/* Name */}
-                <div className="flex items-center gap-4 bg-white/5 p-1 rounded-xl border border-white/10 focus-within:border-white/40 transition-all">
-                    <div className="pl-3 text-slate-400"><Pilcrow size={20}/></div>
-                    <input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className='w-full bg-transparent p-2 outline-none placeholder:text-slate-500'
-                        type="text"
-                        placeholder="Wallet name (e.g. MetaMask)"
-                    />
-                </div>
-
-                {/* Address */}
-                <div className="flex items-center gap-4 bg-white/5 p-1 rounded-xl border border-white/10 focus-within:border-white/40 transition-all">
-                    <div className="pl-3 text-slate-400"><Codesandbox size={20}/></div>
-                    <input
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className='w-full bg-transparent p-2 outline-none placeholder:text-slate-500'
-                        type="text"
-                        placeholder="Wallet Address (0x...)"
-                    />
-                </div>
-
-                {/* Currency */}
-                <div className="flex items-center gap-4 bg-white/5 p-1 rounded-xl border border-white/10 focus-within:border-white/40 transition-all">
-                    <div className="pl-3 text-slate-400"><Landmark size={20}/></div>
-                    <input
-                        value={currency}
-                        onChange={(e) => setCurrency(e.target.value)}
-                        className='w-full bg-transparent p-2 outline-none placeholder:text-slate-500'
-                        type="text"
-                        placeholder="Network (e.g. Ethereum)"
-                    />
-                </div>
-
-                {/* COLOR PALETTE */}
-                <div className="flex items-center gap-4">
-                    <div className="text-slate-400"><Paintbrush2 size={20}/></div>
-                    <div className="flex gap-3">
-                        {colors.map((color) => (
-                            <button
-                                key={color.hex}
-                                onClick={() => setSelectedColor(color.hex)}
-                                className={`w-8 h-8 rounded-full transition-all duration-300 cursor-pointer ${
-                                    selectedColor === color.hex
-                                        ? 'ring-2 ring-white ring-offset-2 ring-offset-[#362F5E] scale-110'
-                                        : 'opacity-50 hover:opacity-100'
-                                }`}
-                                style={{ backgroundColor: color.hex }}
-                                title={color.name}
-                            />
-                        ))}
-                    </div>
-                </div>
+            <div className="grid grid-cols-2 gap-3 mt-3 mb-6">
+                {PLATFORMS.map(p => (
+                    <button
+                        key={p.id}
+                        onClick={() => setPlatform(p)}
+                        className={`flex items-center gap-2 p-3 rounded-2xl border transition-all ${platform.id === p.id ? 'border-blue-500 bg-blue-500/10' : 'border-white/5 bg-white/5'}`}
+                    >
+                        <p.icon size={18} />
+                        <span className="text-sm">{p.name}</span>
+                    </button>
+                ))}
             </div>
+            {/* INPUTS BASIC */}
+            <input
+                placeholder="Label (e.g. My Savings)"
+                className="w-full bg-black/20 p-4 rounded-2xl mb-4 outline-none border border-white/5 focus:border-blue-500"
+                value={name} onChange={e => setName(e.target.value)}
+            />
 
-            <div className="flex items-center justify-center gap-4 mt-4">
-                <button className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition-all active:scale-95">
-                    Cancel
-                </button>
-                <button
-                    onClick={handleSave}
-                    className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold py-3 rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
-                >
-                    Save
-                </button>
-            </div>
+            <input
+                placeholder="API Key or address"
+                value={apiKey}
+                className="w-full bg-black/20 p-4 rounded-2xl mb-4 outline-none border border-white/5 focus:border-blue-500"
+                onChange={e => setApiKey(e.target.value)}
+            />
+
+            {/* INPUTS OPTIONAL */}
+            {platform.type === 'exchange' && (
+                <>
+                    <input
+                        placeholder="API Secret"
+                        type="password"
+                        value={apiSecret}
+                        onChange={e => setApiSecret(e.target.value)}
+                        className="w-full bg-black/20 p-4 rounded-2xl mb-4 outline-none border border-white/5 focus:border-blue-500"
+                    />
+                </>
+            )}
+            {platform.id === 'okx' && (
+                <input
+                    type="password"
+                    placeholder="API Passphrase"
+                    value={passphrase}
+                    onChange={e => setPassphrase(e.target.value)}
+                    className="w-full bg-black/20 p-4 rounded-2xl mb-4 outline-none border border-white/5 focus:border-blue-500"
+                />
+            )}
+            <button onClick={handleSave} className="w-full bg-blue-600 py-4 rounded-2xl font-bold hover:bg-blue-500 transition-all">
+                Connect {platform.name}
+            </button>
         </div>
     );
 };

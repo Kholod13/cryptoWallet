@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, {useMemo} from 'react';
 import { useAppSelector } from '../../store';
 import { Wallet, TrendingUp, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -12,29 +12,24 @@ const currencySymbols: Record<string, string> = {
 };
 
 export const MainBalance = () => {
-    const [isVisible, setIsVisible] = React.useState(true);
-
-    // 1. Берем данные из новых путей Redux
-    const { myAssets } = useAppSelector((state) => state.wallet);
     const { coins, fiatRates } = useAppSelector((state) => state.market);
-    const user = useAppSelector((state) => state.auth.user);
+    const { user } = useAppSelector((state) => state.auth);
+    const { connectedWallets } = useAppSelector(state => state.wallet);
 
-    // Безопасно достаем валюту (если юзер еще не загружен — USD)
     const mainCurrency = user?.mainCurrency || 'USD';
+    const rate = fiatRates[mainCurrency] || 1;
+    const [isVisible, setIsVisible] = React.useState(false);
 
     const totalBalance = useMemo(() => {
-        // 2. Считаем сначала общую сумму всех активов в USD
-        const totalUSD = myAssets.reduce((acc, asset) => {
-            // Ищем монету в списке маркета по символу (так надежнее для разных API)
-            const coinInfo = coins.find(c => c.symbol.toLowerCase() === asset.symbol.toLowerCase());
-            const priceUSD = coinInfo?.current_price || 0;
-            return acc + (asset.amount * priceUSD);
+        const totalUSD = connectedWallets.reduce((total, wallet) => {
+            const walletSum = wallet.assets.reduce((sum, asset) => {
+                const coinPrice = coins.find(c => c.symbol.toLowerCase() === asset.symbol.toLowerCase())?.current_price || 0;
+                return sum + (asset.amount * coinPrice);
+            }, 0);
+            return total + walletSum;
         }, 0);
-
-        // 3. Умножаем на курс из базы (PostgreSQL/API)
-        const rate = fiatRates[mainCurrency] || 1;
-        return totalUSD * rate;
-    }, [myAssets, coins, fiatRates, mainCurrency]);
+        return totalUSD * rate; // ПРИМЕНЯЕМ КОНВЕРТАЦИЮ
+    }, [connectedWallets, coins, rate]);
 
     return (
         <motion.div

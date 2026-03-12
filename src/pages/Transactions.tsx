@@ -1,9 +1,10 @@
+import TransactionHistory from "../components/transactions/TransactionHistory.tsx";
 
 const Transactions = () => {
 
     return (
         <div>
-            <h1>Transactions</h1>
+            <TransactionHistory />
         </div>
     )
 }

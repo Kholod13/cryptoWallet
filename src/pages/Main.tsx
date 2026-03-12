@@ -8,7 +8,10 @@ import {useEffect} from "react";
 const Main = () => {
     const dispatch = useAppDispatch();
     // Looking at mainCurrency in userSlice
-    const { mainCurrency } = useAppSelector(state => state.user);
+    const user = useAppSelector((state) => state.auth.user);
+
+    // Витягуємо валюту безпечно. Якщо user === null (йде завантаження), ставимо 'USD'
+    const mainCurrency = user?.mainCurrency || 'USD';
 
     useEffect(() => {
         dispatch(fetchFiatRates());         // Новый запрос курсов валют
@@ -17,7 +20,7 @@ const Main = () => {
     return (
         <div className="flex">
             <Navbar />
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col min-h-screen flex-1">
                 <Header />
                 {/* blocks container */}
                 <div className='flex flex-col flex-1 bg-neutral-200 py-6 px-10'>
