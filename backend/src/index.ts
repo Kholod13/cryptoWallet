@@ -263,62 +263,60 @@ app.delete('/api/wallets/:id', async (req, res) => {
 });
 
 app.post('/api/wallet/scan', authenticateToken, async (req: any, res: Response) => {
+    const { apiKey } = req.body;
+
+    // --- РЕЖИМ РАЗРАБОТКИ (MOCK DATA) ---
+    // Если ты хочешь работать над UI без запросов к Moralis,
+    // просто раскомментируй этот блок:
+
+    // const mockAssets = [
+    //     { symbol: 'eth', amount: 0.1, price: 2077, usdValue: 207 },
+    // ];
+    // console.log("!!! РАБОТА В MOCK-РЕЖИМЕ (ЛИМИТЫ ЭКОНОМЯТСЯ) !!!");
+    // return res.json({ assets: mockAssets });
+
+    // ------------------------------------
+
     try {
-        const { apiKey, platform } = req.body;
         const MORALIS_API_KEY = process.env.MORALIS_API_KEY;
-        const chain = platform === 'ethereum' ? 'eth' : 'bsc';
+        const chains = ['eth', 'bsc']; // Оставляем минимум
 
-        console.log(`[SCAN] Chain: ${chain}, Address: ${apiKey}`);
-
-        // Функция для безопасного fetch, которая проверяет, JSON ли это
-        const safeFetch = async (url: string) => {
+        const scanChain = async (chain: string) => {
+            const url = `https://deep-index.moralis.io/api/v2.2/wallets/${apiKey}/tokens?chain=${chain}`;
             const response = await fetch(url, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-API-Key': MORALIS_API_KEY as string,
-                    'User-Agent': 'CryptoPulse-App' // Добавляем на всякий случай
-                }
+                headers: { 'X-API-Key': MORALIS_API_KEY as string }
             });
 
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                const errorText = await response.text();
-                console.error("!!! ПОЛУЧЕН НЕ JSON. Текст ответа:", errorText.substring(0, 200));
-                throw new Error(`Moralis returned HTML instead of JSON. Status: ${response.status}`);
+            // Если пришла ошибка лимита (429 или 403 с сообщением о плане)
+            if (response.status === 429 || response.status === 403) {
+                throw new Error("API_LIMIT_REACHED");
             }
 
-            return response.json();
-        };
-
-        // 1. Запрос токенов
-        const tokensData: any = await safeFetch(
-            `https://deep-index.moralis.io/api/v2.2/wallets/${apiKey}/tokens?chain=${chain}`
-        );
-
-        // 2. Запрос нативного баланса
-        const nativeData: any = await safeFetch(
-            `https://deep-index.moralis.io/api/v2.2/${apiKey}/balance?chain=${chain}`
-        );
-
-        const assets = [
-            {
-                symbol: chain === 'eth' ? 'eth' : 'bnb',
-                amount: parseFloat(nativeData.balance || "0") / 10**18,
-                price: nativeData.usd_price || 0
-            },
-            ...(tokensData.result || []).map((t: any) => ({
+            const data: any = await response.json();
+            return (data.result || []).map((t: any) => ({
                 symbol: t.symbol.toLowerCase(),
                 amount: parseFloat(t.balance_formatted),
-                price: t.usd_price || 0
-            }))
-        ].filter(a => a.amount > 0);
+                price: t.usd_price || 0,
+                usdValue: parseFloat(t.usd_value || "0")
+            }));
+        };
 
-        res.json({ assets });
+        const results = await Promise.all(chains.map(c => scanChain(c)));
+        const allAssets = results.flat().filter(a => a.amount > 0);
+
+        res.json({ assets: allAssets });
 
     } catch (error: any) {
-        console.error("SERVER ERROR:", error.message);
-        res.status(400).json({ message: error.message });
+        if (error.message === "API_LIMIT_REACHED") {
+            // Если лимит кончился, отдаем хотя бы что-то, чтобы фронт не вис
+            return res.status(429).json({
+                message: "Moralis limit reached. Using cached/empty data.",
+                assets: []
+            });
+        }
+        res.status(500).json({ message: error.message });
     }
+
 });
 
 app.listen(PORT, () => {

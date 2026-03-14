@@ -49,20 +49,21 @@ export const WalletCard = ({ wallet }: WalletCardProps) => {
         refreshData();
     }, []); // Сработает один раз при монтировании
 
+    // Внутри useMemo в WalletCard.tsx
     const walletValueInCurrency = useMemo(() => {
         const assets = wallet.assets || [];
 
         const totalUSD = assets.reduce((sum: number, asset: any) => {
-            // 1. Пытаемся взять цену, которую прислал кошелек (Moralis/Exchange)
-            // 2. Если её нет, ищем в глобальном Маркете
-            let price = asset.price;
+            // Используем готовую стоимость актива, если она пришла с бэкенда
+            const assetTotalUSD = asset.usdValue || (asset.amount * (asset.price || 0));
 
-            if (!price) {
-                const marketCoin = coins.find(c => c.symbol.toLowerCase() === asset.symbol.toLowerCase());
-                price = marketCoin?.current_price || 0;
-            }
+            if (assetTotalUSD > 0) return sum + assetTotalUSD;
 
-            return sum + (asset.amount * price);
+            // Фолбек на маркет (для ручного ввода)
+            const marketCoin = coins.find(c =>
+                c.symbol.toLowerCase() === asset.symbol.toLowerCase()
+            );
+            return sum + (asset.amount * (marketCoin?.current_price || 0));
         }, 0);
 
         return totalUSD * fiatRate;

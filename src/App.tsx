@@ -10,11 +10,28 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import {useAppDispatch, useAppSelector} from "./store";
 import {useEffect} from "react";
 import {fetchMe} from './store/slices/authSlice'
-import {fetchUserSources} from "./store/slices/walletSlice.ts";
+import {fetchSourceBalances, fetchUserSources, syncExchangeBalances} from "./store/slices/walletSlice.ts";
 
 function App() {
     const dispatch = useAppDispatch();
     const token = useAppSelector(state => state.auth.token);
+
+    const { connectedWallets } = useAppSelector(state => state.wallet);
+
+    useEffect(() => {
+        if (connectedWallets.length > 0) {
+            connectedWallets.forEach(wallet => {
+                // Если кошелек загружен, но данных о монетах нет - обновляем
+                if ((!wallet.assets || wallet.assets.length === 0) && !wallet.isLoading) {
+                    if (wallet.type === 'web3') {
+                        dispatch(fetchSourceBalances(wallet));
+                    } else if (wallet.type === 'exchange') {
+                        dispatch(syncExchangeBalances(wallet as any));
+                    }
+                }
+            });
+        }
+    }, [connectedWallets.length, dispatch]);
 
     useEffect(() => {
         if(token) {

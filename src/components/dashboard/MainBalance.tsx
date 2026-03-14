@@ -23,18 +23,23 @@ export const MainBalance = () => {
 
     // 2. РАСЧЕТ ОБЩЕГО БАЛАНСА (с защитой от пустых assets)
     // Внутри useMemo в MainBalance.tsx
+    // Внутри useMemo в MainBalance.tsx
     const totalBalance = useMemo(() => {
         const totalUSD = connectedWallets.reduce((total, wallet) => {
             const assets = wallet.assets || [];
             const walletSum = assets.reduce((sum: number, asset: any) => {
-                // 1. Ищем цену в Маркете (всегда в нижнем регистре)
+
+                // 1. ПРИОРИТЕТ: берем уже готовую стоимость в USD от Moralis
+                if (asset.usdValue && asset.usdValue > 0) {
+                    return sum + asset.usdValue;
+                }
+
+                // 2. Если стоимости нет, пытаемся рассчитать через Маркет (CoinCap)
                 const marketCoin = coins.find(c =>
                     c.symbol.toLowerCase() === asset.symbol.toLowerCase()
                 );
 
-                // 2. Приоритет: Цена из Маркета, если нет — цена из Moralis (asset.price)
                 const price = marketCoin?.current_price || asset.price || 0;
-
                 return sum + (asset.amount * price);
             }, 0);
             return total + walletSum;

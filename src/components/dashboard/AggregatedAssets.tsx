@@ -19,31 +19,50 @@ export const AggregatedAssets = () => {
     const rate = fiatRates[mainCurrency] || 1;
 
     const data = useMemo(() => {
-        const map: Record<string, { amount: number, symbol: string }> = {};
+        // 1. Создаем карту для суммирования количества монет
+        const map: Record<string, { amount: number, symbol: string, lastPrice: number }> = {};
+
         connectedWallets.forEach(wallet => {
-            wallet.assets.forEach(asset => {
+            (wallet.assets || []).forEach(asset => {
                 const sym = asset.symbol.toLowerCase();
-                if (!map[sym]) map[sym] = { amount: 0, symbol: sym };
+
+                if (!map[sym]) {
+                    map[sym] = { amount: 0, symbol: sym, lastPrice: 0 };
+                }
+
+                // Плюсуем количество монет из этого кошелька к общему числу
                 map[sym].amount += asset.amount;
+
+                // Запоминаем цену из кошелька (если она там есть)
+                if (asset.price) map[sym].lastPrice = asset.price;
             });
         });
 
+        // 2. Превращаем карту в массив и считаем стоимость каждой кучки монет
         return Object.values(map).map(item => {
+            // Ищем актуальную цену в глобальном Маркете
             const marketCoin = coins.find(c => c.symbol.toLowerCase() === item.symbol);
-            const valueInCurrency = item.amount * (marketCoin?.current_price || 0) * rate;
+
+            // ПРИОРИТЕТ ЦЕНЫ: 1. Маркет (CoinCap) | 2. Цена из кошелька | 3. Ноль
+            const currentPrice = marketCoin?.current_price || item.lastPrice || 0;
+
+            // Считаем итоговую стоимость этой монеты во всех кошельках
+            const valueInCurrency = item.amount * currentPrice * rate;
+
             return {
                 name: marketCoin?.name || item.symbol.toUpperCase(),
                 symbol: item.symbol.toUpperCase(),
                 amount: item.amount,
                 value: valueInCurrency,
-                image: marketCoin?.image
+                image: marketCoin?.image || `https://assets.coincap.io/assets/icons/${item.symbol.toLowerCase()}@2x.png`
             };
         })
-            .filter(asset => asset.value > 0.01)
+            .filter(asset => asset.value > 0.1) // Убираем совсем копеечные остатки
             .sort((a, b) => b.value - a.value);
     }, [connectedWallets, coins, rate]);
 
-    const totalValue = data.reduce((a, b) => a + b.value, 0);
+// Важно: totalValue считаем на основе уже агрегированных и отфильтрованных данных
+    const totalValue = useMemo(() => data.reduce((a, b) => a + b.value, 0), [data]);
 
     if (connectedWallets.length === 0) return null;
 

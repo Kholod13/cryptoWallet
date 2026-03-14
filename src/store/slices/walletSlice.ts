@@ -4,6 +4,7 @@ export interface TokenAsset {
     symbol: string;
     amount: number;
     price?: number;
+    usdValue?: number;
 }
 
 export interface ConnectedSource {
@@ -193,12 +194,15 @@ const walletSlice = createSlice({
                 const source = state.connectedWallets.find(w => w.id === action.meta.arg.id);
                 if (source) source.isLoading = true;
             })
+            // В walletSlice.ts
             .addCase(fetchSourceBalances.fulfilled, (state, action) => {
-                console.log('Payload in Redux:', action.payload);
-                const source = state.connectedWallets.find(w => w.id === action.payload.sourceId);
+                // В Thunk мы возвращали { sourceId: source.id, assets: data.assets }
+                const { sourceId, assets } = action.payload;
+                const source = state.connectedWallets.find(w => w.id === sourceId);
                 if (source) {
-                    source.assets = action.payload.assets;
+                    source.assets = assets;
                     source.isLoading = false;
+                    // Сохраняем в локальное хранилище для кэша
                     localStorage.setItem('crypto_sources', JSON.stringify(state.connectedWallets));
                 }
             })
