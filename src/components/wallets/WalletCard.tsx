@@ -50,14 +50,18 @@ export const WalletCard = ({ wallet }: WalletCardProps) => {
     }, []); // Сработает один раз при монтировании
 
     const walletValueInCurrency = useMemo(() => {
-        // ЗАЩИТА: Если assets еще не загружены, используем пустой массив
-        const currentAssets = wallet.assets || [];
+        const assets = wallet.assets || [];
 
-        const totalUSD = currentAssets.reduce((sum: number, asset: any) => {
-            const marketCoin = coins.find(c =>
-                c.symbol.toLowerCase() === asset.symbol.toLowerCase()
-            );
-            const price = marketCoin?.current_price || 0;
+        const totalUSD = assets.reduce((sum: number, asset: any) => {
+            // 1. Пытаемся взять цену, которую прислал кошелек (Moralis/Exchange)
+            // 2. Если её нет, ищем в глобальном Маркете
+            let price = asset.price;
+
+            if (!price) {
+                const marketCoin = coins.find(c => c.symbol.toLowerCase() === asset.symbol.toLowerCase());
+                price = marketCoin?.current_price || 0;
+            }
+
             return sum + (asset.amount * price);
         }, 0);
 
@@ -119,7 +123,7 @@ export const WalletCard = ({ wallet }: WalletCardProps) => {
                 </h3>
 
                 {/* СПИСОК АКТИВОВ ВНУТРИ КАРТОЧКИ */}
-                <div className="flex gap-2 mt-2 flex-wrap">
+                <div className="flex gap-2 mt-2 flex-wrap max-h-[110px] overflow-x-auto">
                     {wallet.assets.length > 0 ? (
                         wallet.assets.map((asset: any) => (
                             <span key={asset.symbol} className="text-[10px] bg-white/5 px-2 py-0.5 rounded-md text-slate-300 border border-white/5 font-bold uppercase">

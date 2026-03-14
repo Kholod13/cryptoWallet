@@ -1,6 +1,7 @@
 /* eslint-disable */
-import 'dotenv/config';
-import express from 'express';
+import dotenv from 'dotenv';
+import path from 'path';
+import express, {Request, Response, NextFunction} from 'express';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -10,7 +11,7 @@ import ccxt from "ccxt";
 
 const app = express();
 
-
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
@@ -18,7 +19,18 @@ const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
 app.use(cors({origin: 'http://localhost:5173'}));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+
+const authenticateToken = (req: any, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: "No token provided" });
+
+    jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
+        if (err) return res.status(403).json({ message: "Invalid or expired token" });
+        req.user = decoded; // Добавляем данные юзера в запрос
+        next();
+    });
+};
 
 // Простой ответ на главной странице http://localhost:5000
 app.get('/', (req, res) => {
@@ -247,6 +259,65 @@ app.delete('/api/wallets/:id', async (req, res) => {
         res.json({ message: "Deleted" });
     } catch (error) {
         res.status(500).json({ message: "Delete failed" });
+    }
+});
+
+app.post('/api/wallet/scan', authenticateToken, async (req: any, res: Response) => {
+    try {
+        const { apiKey, platform } = req.body;
+        const MORALIS_API_KEY = process.env.MORALIS_API_KEY;
+        const chain = platform === 'ethereum' ? 'eth' : 'bsc';
+
+        console.log(`[SCAN] Chain: ${chain}, Address: ${apiKey}`);
+
+        // Функция для безопасного fetch, которая проверяет, JSON ли это
+        const safeFetch = async (url: string) => {
+            const response = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-API-Key': MORALIS_API_KEY as string,
+                    'User-Agent': 'CryptoPulse-App' // Добавляем на всякий случай
+                }
+            });
+
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const errorText = await response.text();
+                console.error("!!! ПОЛУЧЕН НЕ JSON. Текст ответа:", errorText.substring(0, 200));
+                throw new Error(`Moralis returned HTML instead of JSON. Status: ${response.status}`);
+            }
+
+            return response.json();
+        };
+
+        // 1. Запрос токенов
+        const tokensData: any = await safeFetch(
+            `https://deep-index.moralis.io/api/v2.2/wallets/${apiKey}/tokens?chain=${chain}`
+        );
+
+        // 2. Запрос нативного баланса
+        const nativeData: any = await safeFetch(
+            `https://deep-index.moralis.io/api/v2.2/${apiKey}/balance?chain=${chain}`
+        );
+
+        const assets = [
+            {
+                symbol: chain === 'eth' ? 'eth' : 'bnb',
+                amount: parseFloat(nativeData.balance || "0") / 10**18,
+                price: nativeData.usd_price || 0
+            },
+            ...(tokensData.result || []).map((t: any) => ({
+                symbol: t.symbol.toLowerCase(),
+                amount: parseFloat(t.balance_formatted),
+                price: t.usd_price || 0
+            }))
+        ].filter(a => a.amount > 0);
+
+        res.json({ assets });
+
+    } catch (error: any) {
+        console.error("SERVER ERROR:", error.message);
+        res.status(400).json({ message: error.message });
     }
 });
 
