@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Wallet, Smartphone, Landmark, LayoutGrid } from 'lucide-react';
 import { useAppDispatch } from '../../store';
-import {addSource, syncExchangeBalances} from '../../store/slices/walletSlice';
+import {saveSourceToDb, syncExchangeBalances} from '../../store/slices/walletSlice';
 
 const PLATFORMS = [
     { id: 'metamask', name: 'MetaMask', type: 'web3', icon: Wallet },
@@ -21,7 +21,7 @@ export const AddWalletForm = () => {
 
     const handleSave = () => {
         const newId = crypto.randomUUID();
-        dispatch(addSource({
+        dispatch(saveSourceToDb({
             id: newId,
             label: name || platform.name,
             type: platform.type as any,

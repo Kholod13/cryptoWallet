@@ -1,3 +1,4 @@
+/* eslint-disable */
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -179,6 +180,73 @@ app.post('/api/exchange/balances', async (req, res) => {
         res.json({ assets });
     } catch (error: any) {
         res.status(500).json({ message: "Exchange connection failed" });
+    }
+});
+
+// --- РОУТ ПОЛУЧЕНИЯ ВСЕХ КОШЕЛЬКОВ ЮЗЕРА ---
+app.get('/api/wallets', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+
+        // Ищем кошельки, где userId совпадает с ID из токена
+        const wallets = await prisma.account.findMany({
+            where: { userId: decoded.userId }
+        });
+
+        res.json(wallets);
+    } catch (error) {
+        res.status(401).json({ message: "Invalid token" });
+    }
+});
+
+// --- РОУТ СОХРАНЕНИЯ КОШЕЛЬКА ---
+app.post('/api/wallets/add', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+        const data = req.body;
+
+        const newWallet = await prisma.account.create({
+            data: {
+                userId: decoded.userId, // Привязываем к юзеру
+                label: data.label,
+                type: data.type,
+                platform: data.platform,
+                apiKey: data.apiKey,
+                apiSecret: data.apiSecret,
+                passphrase: data.passphrase,
+                color: data.color,
+            }
+        });
+
+        res.status(201).json(newWallet);
+    } catch (error) {
+        res.status(500).json({ message: "Error saving wallet" });
+    }
+});
+
+// --- РОУТ УДАЛЕНИЯ ---
+app.delete('/api/wallets/:id', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+
+        await prisma.account.deleteMany({
+            where: {
+                id: req.params.id,
+                userId: decoded.userId // Проверка, что юзер удаляет СВОЙ кошелек
+            }
+        });
+        res.json({ message: "Deleted" });
+    } catch (error) {
+        res.status(500).json({ message: "Delete failed" });
     }
 });
 

@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import {useAppDispatch, useAppSelector} from "./store";
 import {useEffect} from "react";
 import {fetchMe} from './store/slices/authSlice'
+import {fetchUserSources} from "./store/slices/walletSlice.ts";
 
 function App() {
     const dispatch = useAppDispatch();
@@ -18,6 +19,7 @@ function App() {
     useEffect(() => {
         if(token) {
             dispatch(fetchMe());
+            dispatch(fetchUserSources());
         }
     }, [dispatch, token]);
 

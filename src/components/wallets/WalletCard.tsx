@@ -3,7 +3,11 @@ import { useEffect, useMemo } from 'react';
 import { Copy, Trash2, Wallet, RefreshCcw } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store';
 // Импортируем оба экшена: для кошельков и для бирж
-import { deleteSource, fetchSourceBalances, syncExchangeBalances } from '../../store/slices/walletSlice';
+import {
+    deleteSourceFromDb,
+    fetchSourceBalances,
+    syncExchangeBalances
+} from '../../store/slices/walletSlice';
 import { addToast } from '../../store/slices/toastSlice';
 import { motion } from 'framer-motion';
 
@@ -46,17 +50,14 @@ export const WalletCard = ({ wallet }: WalletCardProps) => {
     }, []); // Сработает один раз при монтировании
 
     const walletValueInCurrency = useMemo(() => {
-        const totalUSD = wallet.assets.reduce((sum: number, asset: any) => {
-            // Ищем монету в списке market по символу
+        // ЗАЩИТА: Если assets еще не загружены, используем пустой массив
+        const currentAssets = wallet.assets || [];
+
+        const totalUSD = currentAssets.reduce((sum: number, asset: any) => {
             const marketCoin = coins.find(c =>
                 c.symbol.toLowerCase() === asset.symbol.toLowerCase()
             );
-
             const price = marketCoin?.current_price || 0;
-
-            // ЛОГ ДЛЯ ДЕБАГА (потом удали)
-            if (price === 0) console.log(`Цена для ${asset.symbol} не найдена в Market!`);
-
             return sum + (asset.amount * price);
         }, 0);
 
@@ -98,7 +99,11 @@ export const WalletCard = ({ wallet }: WalletCardProps) => {
                     >
                         <RefreshCcw size={16} />
                     </button>
-                    <button onClick={() => dispatch(deleteSource(wallet.id))} className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg cursor-pointer">
+                    <button onClick={() => {
+                        // Вызываем асинхронное удаление
+                        dispatch(deleteSourceFromDb(wallet.id));
+                        dispatch(addToast({ message: "Deleting wallet...", type: 'info' }));
+                    }} className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg cursor-pointer">
                         <Trash2 size={16} />
                     </button>
                 </div>

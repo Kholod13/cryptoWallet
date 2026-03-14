@@ -31,9 +31,9 @@ model Account {
   platform    String   // "ethereum", "binance", "okx", "polygon"
   label       String   // "My MetaMask"
 
-  address     String?  // Для web3 кошельков
   apiKey      String?  // Для бирж (публичный ключ)
   apiSecret   String?  // Для бирж (зашифрованный секрет)
+  passphrase  String?  // Personal password for exhange OKX
 
   color       String   @default("#362F5E")
   createdAt   DateTime @default(now())

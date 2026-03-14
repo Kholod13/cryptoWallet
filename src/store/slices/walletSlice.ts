@@ -65,25 +65,106 @@ export const fetchSourceBalances = createAsyncThunk(
     }
 );
 
-const initialState: WalletState = {
-    connectedWallets: JSON.parse(localStorage.getItem('crypto_sources') || '[]'),
-};
+export const fetchUserSources = createAsyncThunk(
+    'wallet/fetchSources',
+    async (_, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5000/api/wallets', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+            return data;
+        } catch (error: any) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+// 2. Thunk для сохранения кошелька в БД (вызывай его вместо addSource в форме)
+export const saveSourceToDb = createAsyncThunk(
+    'wallet/saveSource',
+    async (walletData: ConnectedSource, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5000/api/wallets/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(walletData),
+            });
+            const data = await response.json();
+            return data;
+        } catch (error: any) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+export const deleteSourceFromDb = createAsyncThunk(
+    'wallet/deleteFromDb',
+    async (walletId: string, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/wallets/${walletId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error("Could not delete from DB");
+
+            return walletId; // Возвращаем ID удаленного кошелька
+        } catch (error: any) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
 
 const walletSlice = createSlice({
     name: 'wallet',
-    initialState,
+    initialState: {
+        connectedWallets: [], // Теперь по умолчанию пусто
+    } as WalletState,
     reducers: {
+        // Оставляем для мгновенного UI-отклика или очистки
+        clearWallets: (state) => {
+            state.connectedWallets = [];
+        },
+        // Сохраняем старый addSource для совместимости, но теперь он не главный
         addSource: (state, action: PayloadAction<ConnectedSource>) => {
             state.connectedWallets.push(action.payload);
-            localStorage.setItem('crypto_sources', JSON.stringify(state.connectedWallets));
         },
         deleteSource: (state, action: PayloadAction<string>) => {
             state.connectedWallets = state.connectedWallets.filter(w => w.id !== action.payload);
-            localStorage.setItem('crypto_sources', JSON.stringify(state.connectedWallets));
         }
     },
     extraReducers: (builder) => {
         builder
+            .addCase(deleteSourceFromDb.fulfilled, (state, action) => {
+                // Удаляем из локального стейта только после того, как база подтвердила удаление
+                state.connectedWallets = state.connectedWallets.filter(w => w.id !== action.payload);
+
+                // Опционально чистим localStorage, если ты его еще используешь для этого списка
+                localStorage.setItem('crypto_sources', JSON.stringify(state.connectedWallets));
+            })
+            .addCase(fetchUserSources.fulfilled, (state, action) => {
+                // ПРЕОБРАЗОВАНИЕ: Добавляем поле assets, если его нет в ответе базы
+                state.connectedWallets = action.payload.map((source: any) => ({
+                    ...source,
+                    assets: source.assets || []
+                }));
+            })
+            // Когда кошелек успешно сохранен в БД
+            .addCase(saveSourceToDb.fulfilled, (state, action) => {
+                // Инициализируем новый кошелек с пустым массивом активов
+                state.connectedWallets.push({
+                    ...action.payload,
+                    assets: []
+                });
+            })
             // ОБРАБОТКА БИРЖ (CEX)
             .addCase(syncExchangeBalances.pending, (state, action) => {
                 const source = state.connectedWallets.find(w => w.id === action.meta.arg.id);
@@ -122,5 +203,5 @@ const walletSlice = createSlice({
     }
 });
 
-export const { addSource, deleteSource } = walletSlice.actions;
+export const { addSource, deleteSource, clearWallets } = walletSlice.actions;
 export default walletSlice.reducer;

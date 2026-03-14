@@ -18,7 +18,7 @@ export const MainBalance = () => {
 
     const mainCurrency = user?.mainCurrency || 'USD';
     const rate = fiatRates[mainCurrency] || 1;
-    const [isVisible, setIsVisible] = React.useState(false);
+    const [isVisible, setIsVisible] = React.useState(true);
 
     const totalBalance = useMemo(() => {
         const totalUSD = connectedWallets.reduce((total, wallet) => {
