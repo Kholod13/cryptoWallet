@@ -4,19 +4,27 @@ import Dashboard from "./pages/Dashboard";
 import Wallets from "./pages/Wallets";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
-// Импортируй новые страницы (создай пустые файлы, если их еще нет)
 import AuthPage from "./pages/Auth/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import {useAppDispatch, useAppSelector} from "./store";
 import {useEffect} from "react";
 import {fetchMe} from './store/slices/authSlice'
 import {fetchSourceBalances, fetchUserSources, syncExchangeBalances} from "./store/slices/walletSlice.ts";
+import {setTheme} from "./store/slices/uiSlice.ts";
 
 function App() {
     const dispatch = useAppDispatch();
+    const user = useAppSelector(state => state.auth.user);
     const token = useAppSelector(state => state.auth.token);
 
     const { connectedWallets } = useAppSelector(state => state.wallet);
+
+    useEffect(() => {
+        if (user?.theme) {
+            // Когда данные юзера прилетели из базы, обновляем визуальную тему в uiSlice
+            dispatch(setTheme(user.theme as 'light' | 'dark'));
+        }
+    }, [user?.theme, dispatch]);
 
     useEffect(() => {
         if (connectedWallets.length > 0) {

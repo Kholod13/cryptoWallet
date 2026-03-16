@@ -132,7 +132,7 @@ export const WalletCard = ({ wallet }: WalletCardProps) => {
                             </span>
                         ))
                     ) : (
-                        <span className="text-[10px] text-slate-600 italic">No assets found</span>
+                        <span className="text-[10px] text-slate-600 italic">No assets found or API rate limit reached</span>
                     )}
                 </div>
             </div>

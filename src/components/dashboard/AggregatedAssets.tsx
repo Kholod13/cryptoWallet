@@ -19,49 +19,55 @@ export const AggregatedAssets = () => {
     const rate = fiatRates[mainCurrency] || 1;
 
     const data = useMemo(() => {
-        // 1. Создаем карту для суммирования количества монет
-        const map: Record<string, { amount: number, symbol: string, lastPrice: number }> = {};
+        // Карта для агрегации: ключ — символ монеты
+        const map: Record<string, { amount: number, symbol: string, totalValueUSD: number }> = {};
 
         connectedWallets.forEach(wallet => {
             (wallet.assets || []).forEach(asset => {
                 const sym = asset.symbol.toLowerCase();
 
-                if (!map[sym]) {
-                    map[sym] = { amount: 0, symbol: sym, lastPrice: 0 };
+                // 1. Считаем стоимость ЭТОГО конкретного актива в ЭТОМ кошельке в USD
+                // Используем ту же логику приоритетов, что и в MainBalance
+                let currentAssetUSD = 0;
+
+                if (asset.usdValue && asset.usdValue > 0) {
+                    // Приоритет 1: Готовая сумма от API (Moralis/Exchange)
+                    currentAssetUSD = asset.usdValue;
+                } else {
+                    // Приоритет 2: Расчет по цене (из кошелька или из Маркета)
+                    const marketCoin = coins.find(c => c.symbol.toLowerCase() === sym);
+                    const price = marketCoin?.current_price || asset.price || 0;
+                    currentAssetUSD = asset.amount * price;
                 }
 
-                // Плюсуем количество монет из этого кошелька к общему числу
-                map[sym].amount += asset.amount;
+                // 2. Добавляем данные в общую карту
+                if (!map[sym]) {
+                    map[sym] = { amount: 0, symbol: sym, totalValueUSD: 0 };
+                }
 
-                // Запоминаем цену из кошелька (если она там есть)
-                if (asset.price) map[sym].lastPrice = asset.price;
+                map[sym].amount += asset.amount;
+                map[sym].totalValueUSD += currentAssetUSD;
             });
         });
 
-        // 2. Превращаем карту в массив и считаем стоимость каждой кучки монет
+        // 3. Формируем финальный массив для диаграммы и сетки
         return Object.values(map).map(item => {
-            // Ищем актуальную цену в глобальном Маркете
             const marketCoin = coins.find(c => c.symbol.toLowerCase() === item.symbol);
-
-            // ПРИОРИТЕТ ЦЕНЫ: 1. Маркет (CoinCap) | 2. Цена из кошелька | 3. Ноль
-            const currentPrice = marketCoin?.current_price || item.lastPrice || 0;
-
-            // Считаем итоговую стоимость этой монеты во всех кошельках
-            const valueInCurrency = item.amount * currentPrice * rate;
 
             return {
                 name: marketCoin?.name || item.symbol.toUpperCase(),
                 symbol: item.symbol.toUpperCase(),
                 amount: item.amount,
-                value: valueInCurrency,
+                // Итоговое значение в выбранной валюте (CZK/UAH/USD)
+                value: item.totalValueUSD * rate,
                 image: marketCoin?.image || `https://assets.coincap.io/assets/icons/${item.symbol.toLowerCase()}@2x.png`
             };
         })
-            .filter(asset => asset.value > 0.1) // Убираем совсем копеечные остатки
+            .filter(asset => asset.value > 0.01) // Убираем пыль
             .sort((a, b) => b.value - a.value);
     }, [connectedWallets, coins, rate]);
 
-// Важно: totalValue считаем на основе уже агрегированных и отфильтрованных данных
+    // Сумма теперь всегда будет совпадать с MainBalance, так как она берется из тех же расчетов
     const totalValue = useMemo(() => data.reduce((a, b) => a + b.value, 0), [data]);
 
     if (connectedWallets.length === 0) return null;

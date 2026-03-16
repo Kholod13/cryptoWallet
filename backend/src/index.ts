@@ -142,7 +142,7 @@ app.patch('/api/user/update', async (req, res) => {
         const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
 
         // ВАЖНО: Принимаем данные из тела запроса
-        const { username, profession, avatarUrl, mainCurrency } = req.body;
+        const { username, profession, avatarUrl, mainCurrency, theme } = req.body;
 
         const updatedUser = await prisma.user.update({
             where: { id: decoded.userId },
@@ -150,7 +150,8 @@ app.patch('/api/user/update', async (req, res) => {
                 username,
                 profession,
                 avatarUrl,
-                mainCurrency // Добавляем обновление валюты
+                mainCurrency,
+                theme
             }
         });
 
@@ -263,59 +264,59 @@ app.delete('/api/wallets/:id', async (req, res) => {
 });
 
 app.post('/api/wallet/scan', authenticateToken, async (req: any, res: Response) => {
-    const { apiKey } = req.body;
+    //const { apiKey } = req.body;
 
-    // --- РЕЖИМ РАЗРАБОТКИ (MOCK DATA) ---
-    // Если ты хочешь работать над UI без запросов к Moralis,
-    // просто раскомментируй этот блок:
+        // --- РЕЖИМ РАЗРАБОТКИ (MOCK DATA) ---
+        // Если ты хочешь работать над UI без запросов к Moralis,
+        // просто раскомментируй этот блок:
 
-    // const mockAssets = [
-    //     { symbol: 'eth', amount: 0.1, price: 2077, usdValue: 207 },
-    // ];
-    // console.log("!!! РАБОТА В MOCK-РЕЖИМЕ (ЛИМИТЫ ЭКОНОМЯТСЯ) !!!");
-    // return res.json({ assets: mockAssets });
+    const mockAssets = [
+        { symbol: 'eth', amount: 0.1, price: 2077, usdValue: 207 },
+    ];
+    console.log("!!! РАБОТА В MOCK-РЕЖИМЕ (ЛИМИТЫ ЭКОНОМЯТСЯ) !!!");
+    return res.json({ assets: mockAssets });
 
     // ------------------------------------
 
-    try {
-        const MORALIS_API_KEY = process.env.MORALIS_API_KEY;
-        const chains = ['eth', 'bsc']; // Оставляем минимум
-
-        const scanChain = async (chain: string) => {
-            const url = `https://deep-index.moralis.io/api/v2.2/wallets/${apiKey}/tokens?chain=${chain}`;
-            const response = await fetch(url, {
-                headers: { 'X-API-Key': MORALIS_API_KEY as string }
-            });
-
-            // Если пришла ошибка лимита (429 или 403 с сообщением о плане)
-            if (response.status === 429 || response.status === 403) {
-                throw new Error("API_LIMIT_REACHED");
-            }
-
-            const data: any = await response.json();
-            return (data.result || []).map((t: any) => ({
-                symbol: t.symbol.toLowerCase(),
-                amount: parseFloat(t.balance_formatted),
-                price: t.usd_price || 0,
-                usdValue: parseFloat(t.usd_value || "0")
-            }));
-        };
-
-        const results = await Promise.all(chains.map(c => scanChain(c)));
-        const allAssets = results.flat().filter(a => a.amount > 0);
-
-        res.json({ assets: allAssets });
-
-    } catch (error: any) {
-        if (error.message === "API_LIMIT_REACHED") {
-            // Если лимит кончился, отдаем хотя бы что-то, чтобы фронт не вис
-            return res.status(429).json({
-                message: "Moralis limit reached. Using cached/empty data.",
-                assets: []
-            });
-        }
-        res.status(500).json({ message: error.message });
-    }
+    // try {
+    //     const MORALIS_API_KEY = process.env.MORALIS_API_KEY;
+    //     const chains = ['eth', 'bsc']; // Оставляем минимум
+    //
+    //     const scanChain = async (chain: string) => {
+    //         const url = `https://deep-index.moralis.io/api/v2.2/wallets/${apiKey}/tokens?chain=${chain}`;
+    //         const response = await fetch(url, {
+    //             headers: { 'X-API-Key': MORALIS_API_KEY as string }
+    //         });
+    //
+    //         // Если пришла ошибка лимита (429 или 403 с сообщением о плане)
+    //         if (response.status === 429 || response.status === 403) {
+    //             throw new Error("API_LIMIT_REACHED");
+    //         }
+    //
+    //         const data: any = await response.json();
+    //         return (data.result || []).map((t: any) => ({
+    //             symbol: t.symbol.toLowerCase(),
+    //             amount: parseFloat(t.balance_formatted),
+    //             price: t.usd_price || 0,
+    //             usdValue: parseFloat(t.usd_value || "0")
+    //         }));
+    //     };
+    //
+    //     const results = await Promise.all(chains.map(c => scanChain(c)));
+    //     const allAssets = results.flat().filter(a => a.amount > 0);
+    //
+    //     res.json({ assets: allAssets });
+    //
+    // } catch (error: any) {
+    //     if (error.message === "API_LIMIT_REACHED") {
+    //         // Если лимит кончился, отдаем хотя бы что-то, чтобы фронт не вис
+    //         return res.status(429).json({
+    //             message: "Moralis limit reached. Using cached/empty data.",
+    //             assets: []
+    //         });
+    //     }
+    //     res.status(500).json({ message: error.message });
+    // }
 
 });
 

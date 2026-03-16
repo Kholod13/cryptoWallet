@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../../store';
 // Используем Thunk для синхронизации с базой
 import { updateProfile } from '../../store/slices/authSlice';
-import { setTheme, setLanguage, type LanguageMode } from '../../store/slices/uiSlice';
+import {setLanguage, type LanguageMode, setTheme} from '../../store/slices/uiSlice';
 
 export const AppProperties = () => {
     const dispatch = useAppDispatch();
@@ -13,11 +13,20 @@ export const AppProperties = () => {
     const user = useAppSelector((state) => state.auth.user);
     const { theme, language } = useAppSelector((state) => state.ui);
 
+    const currentTheme = user?.theme || theme;
+
     // Безопасные переменные (защита от null)
     const mainCurrency = user?.mainCurrency || 'USD';
 
     const [langOpen, setLangOpen] = useState(false);
     const [currencyOpen, setCurrencyOpen] = useState(false);
+
+    const handleThemeChange = (newTheme: 'light' | 'dark') => {
+        // 1. Сразу меняем визуально в UI (мгновенный отклик)
+        dispatch(setTheme(newTheme));
+        // 2. Отправляем в базу данных для сохранения в профиле
+        dispatch(updateProfile({ theme: newTheme }));
+    };
 
     const currencies = ['USD', 'EUR', 'CZK', 'UAH'];
     const languages = [
@@ -27,7 +36,8 @@ export const AppProperties = () => {
     ];
 
     return (
-        <div className='flex gap-4 h-max bg-slate-800/50 backdrop-blur-md p-4 rounded-3xl border border-white/10'>
+        //theme using example
+        <div className={`flex gap-4 h-max backdrop-blur-md p-4 rounded-3xl border border-white/10 ${currentTheme === 'light' ? 'bg-slate-800/50' : 'bg-gray-500'}`}>
 
             {/* Language Select */}
             <div className="relative">
@@ -75,19 +85,18 @@ export const AppProperties = () => {
             {/* Theme Switcher */}
             <div className="flex items-center bg-slate-900 p-1.5 rounded-2xl border border-white/5">
                 <div
-                    onClick={() => dispatch(setTheme('light'))}
-                    className={`p-2.5 rounded-xl cursor-pointer transition-all ${theme === 'light' ? 'bg-white text-orange-500 shadow-lg' : 'text-slate-500'}`}
+                    onClick={() => handleThemeChange('light')} // Используем новую функцию
+                    className={`p-2.5 rounded-xl cursor-pointer transition-all ${currentTheme === 'light' ? 'bg-white text-orange-500 shadow-lg' : 'text-slate-500'}`}
                 >
                     <Sun size={20}/>
                 </div>
                 <div
-                    onClick={() => dispatch(setTheme('dark'))}
-                    className={`p-2.5 rounded-xl cursor-pointer transition-all ${theme === 'dark' ? 'bg-[#362F5E] text-white shadow-lg' : 'text-slate-500'}`}
+                    onClick={() => handleThemeChange('dark')} // Используем новую функцию
+                    className={`p-2.5 rounded-xl cursor-pointer transition-all ${currentTheme === 'dark' ? 'bg-[#362F5E] text-white shadow-lg' : 'text-slate-500'}`}
                 >
                     <Moon size={20}/>
                 </div>
             </div>
-
             {/* Currency Select */}
             <div className="relative">
                 <button

@@ -7,6 +7,7 @@ interface User {
     avatarUrl: string | null;
     profession: string | null;
     mainCurrency: string;
+    theme: string;
 }
 
 interface AuthState {
