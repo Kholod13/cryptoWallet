@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { UserRoundIcon, Check } from 'lucide-react';
+import { UserRoundIcon, Check, Camera } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { addToast } from '../../store/slices/toastSlice';
-import {resetStatus, updateProfile} from "../../store/slices/authSlice";
+import { resetStatus, updateProfile } from "../../store/slices/authSlice";
 
 export const UserParams = () => {
     const dispatch = useAppDispatch();
 
-    // 1. ИСПРАВЛЕНО: берем данные из auth.user (так как мы объединили слайсы)
+    // Получаем тему и данные пользователя
+    const { theme } = useAppSelector((state) => state.ui);
     const user = useAppSelector((state) => state.auth.user);
     const { isLoading } = useAppSelector((state) => state.auth);
 
@@ -17,7 +18,6 @@ export const UserParams = () => {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // 2. ДОБАВЛЕНО: Синхронизация полей, когда данные приходят с бэкенда
     useEffect(() => {
         if (user) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -26,11 +26,9 @@ export const UserParams = () => {
             setTempAvatar(user.avatarUrl || '');
         }
     }, [user]);
+
     useEffect(() => {
-        // Эта функция сработает, когда пользователь уходит со страницы Settings
-        return () => {
-            dispatch(resetStatus());
-        };
+        return () => { dispatch(resetStatus()); };
     }, [dispatch]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,78 +39,136 @@ export const UserParams = () => {
                 return;
             }
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setTempAvatar(reader.result as string);
-            };
+            reader.onloadend = () => { setTempAvatar(reader.result as string); };
             reader.readAsDataURL(file);
         }
     };
 
     const handleSave = async () => {
-        // 3. ИСПРАВЛЕНО: Диспатчим и ждем результата для тостера
         const resultAction = await dispatch(updateProfile({
             username: name,
             profession: profession,
             avatarUrl: tempAvatar
         }));
 
-        // Проверяем, успешно ли прошел асинхронный экшен
         if (updateProfile.fulfilled.match(resultAction)) {
-            dispatch(addToast({
-                message: 'Profile updated in database!',
-                type: 'success'
-            }));
-        } else {
-            dispatch(addToast({
-                message: 'Error updating profile',
-                type: 'error'
-            }));
+            dispatch(addToast({ message: 'Profile updated!', type: 'success' }));
         }
     };
 
+    // Стили зависящие от темы
+    const isDark = theme === 'dark';
+
     return (
-        <div className="flex flex-col bg-gray-500 p-5 rounded-2xl gap-6 shadow-inner">
-            <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                <p className="font-bold text-white text-xl tracking-tight">Personal Information</p>
+        <div className={`relative p-[1px] rounded-[32px] overflow-hidden transition-all duration-500 shadow-2xl
+            ${isDark ? 'bg-gradient-to-br from-white/10 to-transparent' : 'bg-gradient-to-br from-slate-200 to-slate-100'}
+        `}>
+            {/* ГЛАВНЫЙ КОНТЕЙНЕР СТЕКЛА */}
+            <div className={`relative z-10 p-6 md:p-8 rounded-[31px] backdrop-blur-[20px] flex flex-col gap-8 transition-colors duration-500
+                ${isDark ? 'bg-[#0D0F14]/90' : 'bg-white/80'}
+            `}>
+
+                {/* ХЕДЕР БЛОКА */}
+                <div className="flex justify-between items-center border-b pb-6 transition-colors duration-500
+                    ${isDark ? 'border-white/5' : 'border-slate-200'}"
+                >
+                    <div>
+                        <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                            Personal Profile
+                        </h3>
+                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">
+                            Manage your public identity
+                        </p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-center">
+
+                    {/* AVATAR SECTION */}
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="relative group">
+                            <div className={`w-32 h-32 rounded-[40px] overflow-hidden border-4 flex items-center justify-center transition-all duration-500 shadow-xl
+                                ${isDark ? 'bg-white/5 border-white/10 group-hover:border-emerald-500/50' : 'bg-slate-100 border-white group-hover:border-blue-500/50'}
+                            `}>
+                                {tempAvatar ? (
+                                    <img src={tempAvatar} alt="preview" className="w-full h-full object-cover" />
+                                ) : (
+                                    <UserRoundIcon size={48} className={isDark ? 'text-slate-700' : 'text-slate-300'} />
+                                )}
+                            </div>
+
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="absolute -bottom-2 -right-2 p-3 bg-blue-600 text-white rounded-2xl shadow-xl hover:scale-110 active:scale-90 transition-all cursor-pointer"
+                            >
+                                <Camera size={20} />
+                            </button>
+                        </div>
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                    </div>
+
+                    {/* INPUTS SECTION */}
+                    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* USERNAME */}
+                        <div className="flex flex-col gap-2">
+                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                                Display Name
+                            </label>
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className={`w-full p-4 rounded-2xl outline-none border-2 transition-all font-bold
+                                    ${isDark
+                                    ? 'bg-white/5 border-transparent focus:border-[#362F5E] text-white'
+                                    : 'bg-slate-50 border-slate-100 focus:border-[#362F5E] text-slate-900'}
+                                `}
+                            />
+                        </div>
+
+                        {/* PROFESSION */}
+                        <div className="flex flex-col gap-2">
+                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                                Professional Role
+                            </label>
+                            <input
+                                type="text"
+                                value={profession}
+                                onChange={(e) => setProfession(e.target.value)}
+                                className={`w-full p-4 rounded-2xl outline-none border-2 transition-all font-bold
+                                    ${isDark
+                                    ? 'bg-white/5 border-transparent focus:border-[#362F5E] text-white'
+                                    : 'bg-slate-50 border-slate-100 focus:border-[#362F5E] text-slate-900'}
+                                `}
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <button
                     onClick={handleSave}
                     disabled={isLoading}
-                    className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold py-2.5 px-8 rounded-xl transition-all duration-200 active:scale-95 shadow-lg cursor-pointer disabled:opacity-50"
+                    className={`flex items-center gap-2 font-black py-3 px-8 rounded-2xl transition-all active:scale-95 cursor-pointer disabled:opacity-50 shadow-lg
+                                        ${isDark
+                        ? 'bg-[#362F5E] text-white hover:bg-[#433a73] shadow-purple-900/20'
+                        : 'bg-[#362F5E] text-white hover:bg-slate-800 shadow-slate-300'}
+                                    `}
                 >
-                    <Check size={18} />
-                    {isLoading ? 'Saving...' : 'Save Changes'}
+                    {isLoading ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : <Check size={20} />}
+                    Save Changes
                 </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-                {/* Image Section */}
-                <div className="flex flex-col items-center gap-3">
-                    <div className="relative group flex items-center justify-center w-28 h-28 bg-gray-400 rounded-3xl overflow-hidden border-4 border-slate-600 shadow-xl">
-                        {tempAvatar ? (
-                            <img src={tempAvatar} alt="preview" className="w-full h-full object-cover" />
-                        ) : (
-                            <UserRoundIcon size={50} className="text-slate-300" />
-                        )}
-                    </div>
-                    <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
-                    <button onClick={() => fileInputRef.current?.click()} className="text-xs font-bold text-blue-300 hover:text-white transition-colors cursor-pointer uppercase tracking-wider">
-                        Change Photo
-                    </button>
-                </div>
-
-                {/* Inputs */}
-                <div className="flex flex-col gap-2">
-                    <label className="text-white text-sm font-bold opacity-70 ml-1">Username</label>
-                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="bg-gray-400 rounded-xl border-2 border-transparent focus:border-[#362F5E] p-3 text-white outline-none transition-all shadow-md" />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                    <label className="text-white text-sm font-bold opacity-70 ml-1">Profession</label>
-                    <input type="text" value={profession} onChange={(e) => setProfession(e.target.value)} className="bg-gray-400 rounded-xl border-2 border-transparent focus:border-[#362F5E] p-3 text-white outline-none transition-all shadow-md" />
-                </div>
-            </div>
         </div>
-    );
+
+    {/* ТЕКСТУРА ШУМА (только для темной темы) */}
+    {isDark && (
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay"
+             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")` }}>
+        </div>
+    )}
+</div>
+);
 };
 
 export default UserParams;

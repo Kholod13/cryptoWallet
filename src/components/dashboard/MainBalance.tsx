@@ -106,7 +106,7 @@ export const MainBalance = () => {
                         </h2>
                     </div>
 
-                    <span className="text-2xl font-bold text-emerald-400 opacity-60">
+                    <span className="text-2xl font-bold text-emerald-400 opacity-60 pr-15">
                         {mainCurrency}
                     </span>
                 </div>

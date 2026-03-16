@@ -32,7 +32,7 @@ export const PnLAnalytics = () => {
     }, [period, rate]);
 
     return (
-        <div className="relative p-[1px] rounded-[48px] overflow-hidden bg-gradient-to-b from-white/10 to-transparent shadow-2xl h-full">
+        <div className="relative p-[1px] rounded-[48px] overflow-hidden bg-gradient-to-b from-white/10 to-transparent shadow-2xl h-full w-full">
             <div className="relative z-10 bg-[#0D0F14] rounded-[47px] p-8 h-full overflow-hidden flex flex-col">
 
                 {/* ДИНАМИЧЕСКОЕ СВЕЧЕНИЕ (Зависит от профита) */}
