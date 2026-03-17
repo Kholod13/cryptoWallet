@@ -1,1 +1,57 @@
 @import 'tailwindcss';
+
+/* --- SOFT DARK THEME --- */
+.dark {
+    --bg-main: #12141C;
+    --bg-card: rgba(255, 255, 255, 0.03);
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --text-primary: #E2E8F0; /* Не чисто белый, а светло-серый */
+    --text-secondary: #94A3B8;
+}
+
+/* --- SOFT LIGHT THEME --- */
+/* --- СВЕТЛАЯ ТЕМА (LIGHT MODE REWORK) --- */
+.light {
+    /* Основной фон страницы (чуть холодный серый) */
+    --bg-main: #F0F2F5;
+
+    /* Фон карточек и Хедера (чисто белый) */
+    --bg-card: #FFFFFF;
+
+    /* Границы (чуть заметнее) */
+    --border-subtle: rgba(0, 0, 0, 0.08);
+
+    /* Тени (КРИТИЧНО для светлой темы) */
+    --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.05),
+    0 4px 15px -5px rgba(0, 0, 0, 0.05);
+
+    --text-primary: #0F172A; /* Почти черный */
+    --text-secondary: #64748B; /* Серый */
+}
+
+/* Применяем ко всем "стеклянным" блокам в светлой теме */
+.light .glass-card,
+.light header,
+.light .aggregated-assets-block {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    box-shadow: var(--shadow-premium) !important;
+    backdrop-filter: blur(10px);
+}
+.glass-card {
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+    transition: all 0.5s ease;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* Мягкие заголовки */
+h1, h2, h3, .pageTitle {
+    color: var(--text-primary);
+    letter-spacing: -0.02em; /* Немного сближаем буквы для стиля */
+}
+
+p, span {
+    color: var(--text-secondary);
+}

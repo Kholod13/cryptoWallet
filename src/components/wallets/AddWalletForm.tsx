@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     Wallet,
     Smartphone,
@@ -10,244 +11,280 @@ import {
     ShieldCheck,
     Key,
     Lock,
-    RefreshCcw,
 } from 'lucide-react';
-import { useAppDispatch } from '../../store';
-import {fetchSourceBalances, saveSourceToDb, syncExchangeBalances} from '../../store/slices/walletSlice';
-import {AnimatePresence, motion} from "framer-motion";
+import { useAppDispatch, useAppSelector } from '../../store';
+import { fetchSourceBalances, saveSourceToDb, syncExchangeBalances } from '../../store/slices/walletSlice';
+import { motion } from "framer-motion";
 
 const PLATFORMS = [
-    { id: 'metamask', name: 'MetaMask', type: 'web3', icon: Wallet },
-    { id: 'binance', name: 'Binance', type: 'exchange', icon: Landmark },
-    { id: 'okx', name: 'OKX', type: 'exchange', icon: LayoutGrid },
-    { id: 'trustwallet', name: 'Trust Wallet', type: 'web3', icon: Smartphone },
+    { id: 'metamask', name: 'MetaMask', type: 'web3' as const, icon: Wallet },
+    { id: 'binance', name: 'Binance', type: 'exchange' as const, icon: Landmark },
+    { id: 'okx', name: 'OKX', type: 'exchange' as const, icon: LayoutGrid },
+    { id: 'trustwallet', name: 'Trust Wallet', type: 'web3' as const, icon: Smartphone },
 ];
 
 export const AddWalletForm = () => {
     const dispatch = useAppDispatch();
-    const [name, setName] = useState('');
-    const [platform, setPlatform] = useState(PLATFORMS[0]);
-    const [apiKey, setApiKey] = useState('');
-    const [apiSecret, setApiSecret] = useState('');
+    const { theme } = useAppSelector((state) => state.ui);
+    const isDark = theme === 'dark';
 
+    // Состояние формы (объединил в один объект для handleChange)
+    const [formData, setFormData] = useState({
+        name: '',
+        apiKey: '',
+        apiSecret: '',
+        passphrase: ''
+    });
+
+    const [platform, setPlatform] = useState(PLATFORMS[0]);
     const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-    const [passphrase, setPassphrase] = useState('');
+    // Функция обновления полей (исправлено)
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
     const handleSave = () => {
-        const newId = crypto.randomUUID();
+        if (!formData.apiKey) return;
 
-        // Данные, которые мы сохраняем
+        const newId = crypto.randomUUID();
         const newSource = {
             id: newId,
-            label: name || platform.name,
-            type: platform.type as any,
+            label: formData.name || platform.name,
+            type: platform.type,
             platform: platform.id as any,
-            apiKey,      // Для кошелька это 0x... адрес, для биржи это API Key
-            apiSecret,   // Только для бирж
-            passphrase,  // Только для OKX
+            apiKey: formData.apiKey,
+            apiSecret: formData.apiSecret,
+            passphrase: formData.passphrase,
             color: '#362F5E',
             assets: []
         };
 
-        // 1. Сохраняем в базу данных (PostgreSQL)
         dispatch(saveSourceToDb(newSource));
 
-        // 2. ЗАПУСКАЕМ СИНХРОНИЗАЦИЮ
         if (platform.type === 'exchange') {
-            // Логика для Binance / OKX
             dispatch(syncExchangeBalances({
                 id: newId,
                 platform: platform.id,
-                apiKey,
-                apiSecret,
-                passphrase
+                apiKey: formData.apiKey,
+                apiSecret: formData.apiSecret,
+                passphrase: formData.passphrase
             }));
         } else if (platform.type === 'web3') {
-            // ЛОГИКА ДЛЯ METAMASK / TRUST WALLET (Moralis)
-            // ВАЖНО: вызываем Thunk, который идет на твой роут /api/wallet/scan
             dispatch(fetchSourceBalances(newSource));
         }
 
-        // 3. Очистка полей
-        setApiKey('');
-        setApiSecret('');
-        setName('');
-        setPassphrase('');
+        // Очистка (исправлено)
+        setFormData({ name: '', apiKey: '', apiSecret: '', passphrase: '' });
     };
 
     return (
-        <div className="bg-[#161B26] p-6 rounded-[32px] text-white w-full max-w-md shadow-2xl border border-white/5">
-            <div className='flex gap-3 items-center'>
-                <h3 className="text-xl font-bold mb-6">Connect Source</h3>
-                <div
-                    onClick={() => setIsHelpOpen(true)}
-                    className="cursor-pointer hover:scale-110 transition-transform text-gray-500 hover:text-[#362F5E]"
-                >
-                    <CircleHelp size={22} />
-                </div>
-            </div>
+        <div className={`relative p-[1px] rounded-[40px] transition-all duration-500 shadow-2xl h-fit
+            ${isDark ? 'bg-gradient-to-br from-white/10 to-transparent' : 'bg-gradient-to-br from-slate-200 to-white'}
+        `}>
+            <div className={`relative z-10 p-8 rounded-[39px] backdrop-blur-[20px] transition-colors duration-500
+                ${isDark ? 'bg-[#161B26]/80' : 'bg-white/80'}
+            `}>
 
-            <div className="grid grid-cols-2 gap-3 mt-3 mb-6">
-                {PLATFORMS.map(p => (
-                    <button
-                        key={p.id}
-                        onClick={() => setPlatform(p)}
-                        className={`flex items-center gap-2 p-3 rounded-2xl border transition-all ${platform.id === p.id ? 'border-blue-500 bg-blue-500/10' : 'border-white/5 bg-white/5'}`}
+                <div className='flex justify-between items-center mb-8'>
+                    <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        Connect Source
+                    </h3>
+                    <div
+                        onClick={() => setIsHelpOpen(true)}
+                        className={`cursor-pointer hover:scale-110 transition-transform ${isDark ? 'text-slate-500 hover:text-blue-400' : 'text-slate-400 hover:text-blue-500'}`}
                     >
-                        <p.icon size={18} />
-                        <span className="text-sm">{p.name}</span>
-                    </button>
-                ))}
-            </div>
-            {/* INPUTS BASIC */}
-            <input
-                placeholder="Label (e.g. My Savings)"
-                className="w-full bg-black/20 p-4 rounded-2xl mb-4 outline-none border border-white/5 focus:border-blue-500"
-                value={name} onChange={e => setName(e.target.value)}
-            />
-
-            <input
-                placeholder="API Key or address"
-                value={apiKey}
-                className="w-full bg-black/20 p-4 rounded-2xl mb-4 outline-none border border-white/5 focus:border-blue-500"
-                onChange={e => setApiKey(e.target.value)}
-            />
-
-            {/* INPUTS OPTIONAL */}
-            {platform.type === 'exchange' && (
-                <>
-                    <input
-                        placeholder="API Secret"
-                        type="password"
-                        value={apiSecret}
-                        onChange={e => setApiSecret(e.target.value)}
-                        className="w-full bg-black/20 p-4 rounded-2xl mb-4 outline-none border border-white/5 focus:border-blue-500"
-                    />
-                </>
-            )}
-            {platform.id === 'okx' && (
-                <input
-                    type="password"
-                    placeholder="API Passphrase"
-                    value={passphrase}
-                    onChange={e => setPassphrase(e.target.value)}
-                    className="w-full bg-black/20 p-4 rounded-2xl mb-4 outline-none border border-white/5 focus:border-blue-500"
-                />
-            )}
-            <button onClick={handleSave} className="w-full bg-blue-600 py-4 rounded-2xl font-bold hover:bg-blue-500 transition-all">
-                Connect {platform.name}
-            </button>
-
-            {/* --- ВСПЛЫВАЮЩЕЕ ОКНО ПОМОЩИ (MODAL) --- */}
-            <AnimatePresence>
-                {isHelpOpen && (
-                    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 text-left">
-                        {/* Backdrop */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsHelpOpen(false)}
-                            className="absolute inset-0 bg-black/70 backdrop-blur-md"
-                        />
-
-                        {/* Modal Content */}
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="relative bg-[#161B26] border border-white/10 w-full max-w-xl rounded-[40px] p-10 shadow-2xl text-white overflow-hidden"
-                        >
-                            {/* Декоративное свечение внутри модалки */}
-                            <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-                            <div className="flex justify-between items-center mb-8 relative z-10">
-                                <div>
-                                    <h3 className="text-2xl font-black tracking-tight flex items-center gap-3">
-                                        <Info className="text-blue-400" size={28} />
-                                        Connection Guide
-                                    </h3>
-                                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Setup your digital assets</p>
-                                </div>
-                                <button onClick={() => setIsHelpOpen(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors cursor-pointer">
-                                    <X size={24} className="text-slate-500" />
-                                </button>
-                            </div>
-
-                            <div className="space-y-8 overflow-y-auto max-h-[65vh] pr-4 custom-scrollbar relative z-10">
-
-                                {/* Section 1: Web3 */}
-                                <div className="flex gap-5">
-                                    <div className="p-3.5 h-fit bg-blue-500/10 rounded-2xl text-blue-400 border border-blue-500/20">
-                                        <Wallet size={24}/>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-lg text-white">Web3 Wallets (MetaMask, Trust)</h4>
-                                        <p className="text-sm text-slate-400 leading-relaxed mt-1">
-                                            You only need your <span className="text-blue-400 font-mono">Public Address</span> (starts with 0x...). Simply copy it from your wallet and paste it into the address field. No private keys are ever required!
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Section 2: CEX API */}
-                                <div className="flex gap-5">
-                                    <div className="p-3.5 h-fit bg-emerald-500/10 rounded-2xl text-emerald-400 border border-emerald-500/20">
-                                        <Key size={24}/>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-lg text-white">Exchanges (Binance, OKX)</h4>
-                                        <p className="text-sm text-slate-400 leading-relaxed mt-1">
-                                            Go to the <span className="text-white italic">API Management</span> section on your exchange. You will need to generate an <span className="text-emerald-400 font-bold">API Key</span> and an <span className="text-emerald-400 font-bold">API Secret</span>.
-                                        </p>
-                                        <div className="mt-3 p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10 flex items-start gap-3">
-                                            <ShieldCheck size={18} className="text-emerald-500 mt-0.5 shrink-0" />
-                                            <p className="text-xs text-emerald-500/80 italic font-medium">
-                                                CRITICAL: Always set permissions to <b>"Read-only"</b>. Disable "Withdrawal" and "Trade" for maximum security.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Section 3: OKX Exception */}
-                                <div className="flex gap-5">
-                                    <div className="p-3.5 h-fit bg-amber-500/10 rounded-2xl text-amber-400 border border-amber-500/20">
-                                        <Lock size={24}/>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-lg text-white font-mono uppercase tracking-tighter">OKX Specifics</h4>
-                                        <p className="text-sm text-slate-400 leading-relaxed mt-1">
-                                            Unlike Binance, OKX requires a <span className="text-amber-400 font-bold">Passphrase</span>. This is a unique password you create <b>manually</b> while setting up the API key. You must enter all three: Key, Secret, and Passphrase.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Section 4: Sync */}
-                                <div className="flex gap-5">
-                                    <div className="p-3.5 h-fit bg-slate-500/10 rounded-2xl text-slate-400 border border-white/5">
-                                        <RefreshCcw size={24}/>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-lg text-white">Real-time Synchronization</h4>
-                                        <p className="text-sm text-slate-400 leading-relaxed mt-1">
-                                            After adding a source, use the <b>Refresh</b> icon on the wallet card to fetch live balances directly from the blockchain or exchange servers.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={() => setIsHelpOpen(false)}
-                                className="w-full mt-10 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/30 cursor-pointer"
-                            >
-                                Understood
-                            </button>
-                        </motion.div>
+                        <CircleHelp size={24} />
                     </div>
-                )}
-            </AnimatePresence>
-        </div>
+                </div>
 
+                <div className="grid grid-cols-2 gap-3 mb-8">
+                    {PLATFORMS.map(p => (
+                        <button
+                            key={p.id}
+                            onClick={() => setPlatform(p)}
+                            className={`flex items-center gap-3 p-3.5 rounded-2xl border-2 transition-all cursor-pointer font-bold text-sm
+                                ${platform.id === p.id
+                                ? (isDark ? 'border-blue-500 bg-blue-500/10 text-white' : 'border-[#362F5E] bg-[#362F5E]/5 text-[#362F5E]')
+                                : (isDark ? 'border-white/5 bg-white/5 text-slate-500' : 'border-slate-100 bg-slate-50 text-slate-400')
+                            }
+                            `}
+                        >
+                            <p.icon size={20} />
+                            <span>{p.name}</span>
+                        </button>
+                    ))}
+                </div>
+
+                <div className="flex flex-col gap-4 text-left">
+                    <div className="space-y-1.5 text-left">
+                        <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Label Name</label>
+                        <input
+                            name="name"
+                            placeholder="e.g. Main Wallet"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className={`w-full p-4 rounded-2xl outline-none border-2 transition-all font-bold
+                                ${isDark
+                                ? 'bg-black/20 border-transparent focus:border-[#362F5E] text-white placeholder:text-slate-800'
+                                : 'bg-slate-100/50 border-slate-100 focus:border-[#362F5E] text-slate-900 placeholder:text-slate-300'}
+                            `}
+                        />
+                    </div>
+
+                    <div className="space-y-1.5 text-left">
+                        <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                            {platform.type === 'web3' ? 'Wallet Address' : 'API Key'}
+                        </label>
+                        <input
+                            name="apiKey"
+                            placeholder={platform.type === 'web3' ? "0x..." : "Your API Key"}
+                            value={formData.apiKey}
+                            onChange={handleChange}
+                            className={`w-full p-4 rounded-2xl outline-none border-2 transition-all font-mono text-sm
+                                ${isDark
+                                ? 'bg-black/20 border-transparent focus:border-[#362F5E] text-blue-400 placeholder:text-slate-800'
+                                : 'bg-slate-100/50 border-slate-100 focus:border-[#362F5E] text-blue-600 placeholder:text-slate-300'}
+                            `}
+                        />
+                    </div>
+
+                    {platform.type === 'exchange' && (
+                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="space-y-1.5">
+                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>API Secret</label>
+                            <input
+                                name="apiSecret"
+                                placeholder="••••••••••••"
+                                type="password"
+                                value={formData.apiSecret}
+                                onChange={handleChange}
+                                className={`w-full p-4 rounded-2xl outline-none border-2 transition-all
+                                    ${isDark
+                                    ? 'bg-black/20 border-transparent focus:border-[#362F5E] text-white'
+                                    : 'bg-slate-100/50 border-slate-100 focus:border-[#362F5E] text-slate-900'}
+                                `}
+                            />
+                        </motion.div>
+                    )}
+
+                    {platform.id === 'okx' && (
+                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="space-y-1.5">
+                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Passphrase</label>
+                            <input
+                                name="passphrase"
+                                type="password"
+                                placeholder="Your API Passphrase"
+                                value={formData.passphrase}
+                                onChange={handleChange}
+                                className={`w-full p-4 rounded-2xl outline-none border-2 transition-all
+                                    ${isDark
+                                    ? 'bg-black/20 border-transparent focus:border-[#362F5E] text-white'
+                                    : 'bg-slate-100/50 border-slate-100 focus:border-[#362F5E] text-slate-900'}
+                                `}
+                            />
+                        </motion.div>
+                    )}
+                </div>
+
+                <button
+                    onClick={handleSave}
+                    className={`w-full mt-10 py-5 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl cursor-pointer
+                        ${isDark ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/20' : 'bg-[#362F5E] hover:opacity-90 text-white shadow-slate-200'}
+                    `}
+                >
+                    Connect {platform.name}
+                </button>
+            </div>
+
+            {/* ПОРТАЛ (Исправлено - портал обернут в AnimatePresence условие) */}
+            {isHelpOpen && createPortal(
+                <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        onClick={() => setIsHelpOpen(false)}
+                        className="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-pointer"
+                    />
+
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        onClick={(e) => e.stopPropagation()}
+                        className={`relative w-full max-w-xl rounded-[40px] p-10 shadow-2xl border overflow-hidden
+                            ${isDark ? 'bg-[#161B26] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'}
+                        `}
+                    >
+                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+                        <div className="flex justify-between items-center mb-8 relative z-10 text-left">
+                            <div>
+                                <h3 className="text-2xl font-black tracking-tight flex items-center gap-3 text-left">
+                                    <Info className="text-blue-500" size={28} />
+                                    Guide
+                                </h3>
+                                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Connection Details</p>
+                            </div>
+                            <button onClick={() => setIsHelpOpen(false)} className="p-2 hover:bg-white/5 rounded-full cursor-pointer">
+                                <X size={24} className="text-slate-400" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-8 overflow-y-auto max-h-[60vh] pr-4 custom-scrollbar relative z-10 text-left">
+                            <div className="flex gap-5">
+                                <div className={`p-3.5 h-fit rounded-2xl bg-blue-500/10 text-blue-500 border ${isDark ? 'border-blue-500/20' : 'border-blue-500/10'}`}>
+                                    <Wallet size={24}/>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-lg">Web3 Wallets</h4>
+                                    <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                        Copy your <span className="font-mono font-bold text-blue-500">Public Address</span> (0x...). We never ask for private keys.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-5">
+                                <div className={`p-3.5 h-fit rounded-2xl bg-emerald-500/10 text-emerald-500 border ${isDark ? 'border-emerald-500/20' : 'border-emerald-500/10'}`}>
+                                    <Key size={24}/>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-lg">Exchanges</h4>
+                                    <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                        Provide your <span className="font-bold text-emerald-500">API Key</span> and <span className="font-bold text-emerald-500">Secret</span>.
+                                    </p>
+                                    <div className="mt-3 p-3 bg-amber-500/5 rounded-xl border border-amber-500/10 flex items-start gap-3">
+                                        <ShieldCheck size={18} className="text-amber-500 shrink-0 mt-0.5" />
+                                        <p className="text-[11px] text-amber-600 italic font-medium leading-tight">
+                                            Enable <b>"Read-only"</b> permissions only.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-5">
+                                <div className={`p-3.5 h-fit rounded-2xl bg-amber-500/10 text-amber-400 border ${isDark ? 'border-amber-500/20' : 'border-amber-500/10'}`}>
+                                    <Lock size={24}/>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-lg">OKX Passphrase</h4>
+                                    <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                        OKX requires your custom API <b>Passphrase</b> for authentication.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setIsHelpOpen(false)}
+                            className={`w-full mt-10 text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-lg transition-all active:scale-95 cursor-pointer
+                                ${isDark ? 'bg-blue-600' : 'bg-[#362F5E]'}
+                            `}
+                        >
+                            Got it
+                        </button>
+                    </motion.div>
+                </div>,
+                document.body
+            )}
+        </div>
     );
 };
 
