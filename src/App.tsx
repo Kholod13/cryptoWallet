@@ -17,9 +17,31 @@ function App() {
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.auth.user);
     const token = useAppSelector(state => state.auth.token);
+
     const { i18n } = useTranslation();
+    const { language } = useAppSelector(state => state.ui);
 
     const { connectedWallets } = useAppSelector(state => state.wallet);
+
+    useEffect(() => {
+        // Если в Redux (из localStorage) язык UA, а i18n думает что EN
+        if (language && i18n.language !== language) {
+            i18n.changeLanguage(language);
+        }
+    }, [language]);
+
+    useEffect(() => {
+        if(token) {
+            dispatch(fetchMe());
+            dispatch(fetchUserSources());
+        }
+    }, [dispatch, token]);
+
+    // useEffect(() => {
+    //     if (user?.language && user.language !== language) {
+    //         dispatch(setLanguage(user.language as LanguageMode));
+    //     }
+    // }, [user?.language, dispatch, language]);
 
     useEffect(() => {
         if (user?.theme) {
@@ -27,12 +49,6 @@ function App() {
             dispatch(setTheme(user.theme as 'light' | 'dark'));
         }
     }, [user?.theme, dispatch]);
-
-    useEffect(() => {
-        if (user?.language) {
-            i18n.changeLanguage(user.language);
-        }
-    }, [user?.language]);
 
     useEffect(() => {
         if (connectedWallets.length > 0) {
@@ -48,13 +64,6 @@ function App() {
             });
         }
     }, [connectedWallets.length, dispatch]);
-
-    useEffect(() => {
-        if(token) {
-            dispatch(fetchMe());
-            dispatch(fetchUserSources());
-        }
-    }, [dispatch, token]);
 
     return (
         <BrowserRouter>

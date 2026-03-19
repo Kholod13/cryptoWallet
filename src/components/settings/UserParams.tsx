@@ -3,9 +3,12 @@ import { UserRoundIcon, Check, Camera } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { addToast } from '../../store/slices/toastSlice';
 import { resetStatus, updateProfile } from "../../store/slices/authSlice";
+import {useTranslation} from "react-i18next";
 
 export const UserParams = () => {
     const dispatch = useAppDispatch();
+
+    const { t } = useTranslation();
 
     // Получаем тему и данные пользователя
     const { theme } = useAppSelector((state) => state.ui);
@@ -74,10 +77,10 @@ export const UserParams = () => {
                 >
                     <div>
                         <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                            Personal Profile
+                            {t('profile.title')}
                         </h3>
                         <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">
-                            Manage your public identity
+                            {t('profile.undertitle')}
                         </p>
                     </div>
                 </div>
@@ -112,7 +115,7 @@ export const UserParams = () => {
                         {/* USERNAME */}
                         <div className="flex flex-col gap-2">
                             <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                                Display Name
+                                {t('profile.name')}
                             </label>
                             <input
                                 type="text"
@@ -129,7 +132,7 @@ export const UserParams = () => {
                         {/* PROFESSION */}
                         <div className="flex flex-col gap-2">
                             <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                                Professional Role
+                                {t('profile.role')}
                             </label>
                             <input
                                 type="text"
@@ -157,7 +160,7 @@ export const UserParams = () => {
                     {isLoading ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : <Check size={20} />}
-                    Save Changes
+                    {t('profile.button')}
                 </button>
         </div>
 

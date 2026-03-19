@@ -5,13 +5,12 @@ import {
 import { Link } from "react-router-dom";
 //import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from 'framer-motion';
-import { /*type RootState,*/ useAppSelector } from '../../store/';
+import { useAppSelector } from '../../store/';
 import { createPortal } from 'react-dom';
 import {useTranslation} from "react-i18next";
 
 export const Header = () => {
-    //const title = useSelector((state: RootState) => state.ui.pageTitle);
-    const { theme } = useAppSelector((state) => state.ui);
+    const { pageTitleKey, theme } = useAppSelector((state) => state.ui);
     const user = useAppSelector((state) => state.auth.user);
 
     const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -32,7 +31,7 @@ export const Header = () => {
             {/* Title */}
             <div className="w-1/4">
                 <h1 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-800'}`}>
-                    {t('common.dashboard')}
+                    {t(pageTitleKey)}
                 </h1>
             </div>
 
@@ -44,7 +43,7 @@ export const Header = () => {
                 <Search size={18} className="text-slate-500" />
                 <input
                     type="text"
-                    placeholder="Search assets..."
+                    placeholder={t('header.search')}
                     className="bg-transparent border-none outline-none text-sm w-full placeholder:text-slate-500"
                 />
             </div>
@@ -122,9 +121,9 @@ export const Header = () => {
                                     <div>
                                         <h3 className="text-2xl font-black tracking-tight flex items-center gap-3">
                                             <Info className="text-blue-500" size={28} />
-                                            Connection Guide
+                                            {t('connection_guide.title')}
                                         </h3>
-                                        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Everything you need to know</p>
+                                        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">{t('connection_guide.undertitle')}</p>
                                     </div>
                                     <button onClick={() => setIsHelpOpen(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors cursor-pointer">
                                         <X size={24} className="text-slate-400" />
@@ -139,9 +138,9 @@ export const Header = () => {
                                             <Wallet size={24}/>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-lg">Web3 Wallets (MetaMask, Trust)</h4>
+                                            <h4 className="font-bold text-lg">{t('connection_guide.web3.title')}</h4>
                                             <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                                Just copy your <span className="font-mono font-bold text-blue-500">Public Address</span> (starts with 0x...). Paste it into the address field. <b>Never</b> enter your recovery phrase or private keys.
+                                                {t('connection_guide.web3.description')}
                                             </p>
                                         </div>
                                     </div>
@@ -152,14 +151,14 @@ export const Header = () => {
                                             <Key size={24}/>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-lg">Centralized Exchanges</h4>
+                                            <h4 className="font-bold text-lg">{t('connection_guide.exchanges.title')}</h4>
                                             <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                                Go to your Exchange settings and find <b>API Management</b>. Generate an <b>API Key</b> and <b>API Secret</b>.
+                                                {t('connection_guide.exchanges.description')}
                                             </p>
                                             <div className="mt-3 p-3 bg-amber-500/5 rounded-xl border border-amber-500/10 flex items-start gap-3">
                                                 <ShieldCheck size={18} className="text-amber-500 shrink-0 mt-0.5" />
                                                 <p className="text-[11px] text-amber-600 italic font-medium leading-tight">
-                                                    CRITICAL: Always set permissions to <b>"Read-only"</b>. Disable Withdrawals and Trading for security.
+                                                    {t('connection_guide.exchanges.critical')}
                                                 </p>
                                             </div>
                                         </div>
@@ -171,9 +170,9 @@ export const Header = () => {
                                             <Lock size={24}/>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-lg">OKX Special Requirements</h4>
+                                            <h4 className="font-bold text-lg">{t('connection_guide.okx.title')}</h4>
                                             <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                                Unlike other exchanges, OKX requires a <span className="font-bold text-amber-500">Passphrase</span>. This is a password you create specifically for the API key. You must provide all three: Key, Secret, and Passphrase.
+                                                {t('connection_guide.okx.description')}
                                             </p>
                                         </div>
                                     </div>
@@ -184,9 +183,9 @@ export const Header = () => {
                                             <PieChart size={24}/>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-lg">Analytics & Balance</h4>
+                                            <h4 className="font-bold text-lg">{t('connection_guide.analytics.title')}</h4>
                                             <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                                Once connected, your dashboard will automatically aggregate all tokens and calculate your <b>Total Net Worth</b> in real-time.
+                                                {t('connection_guide.analytics.description')}
                                             </p>
                                         </div>
                                     </div>
@@ -196,7 +195,7 @@ export const Header = () => {
                                     onClick={() => setIsHelpOpen(false)}
                                     className="w-full mt-10 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/30 cursor-pointer"
                                 >
-                                    Got it, let's track!
+                                    {t('connection_guide.button')}
                                 </button>
                             </motion.div>
                         </div>

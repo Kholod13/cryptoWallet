@@ -2,9 +2,132 @@
   "common": {
     "dashboard": "Nástěnka",
     "wallets": "Peněženky",
-    "settings": "Nastavení",
-    "total_balance": "Celkový zůstatek",
-    "recent_activity": "Nedávná aktivita",
-    "save": "Uložit změny"
+    "transactions": "Transakce",
+    "settings": "Nastavení"
+  },
+  "navbar": {
+    "developed_by": "Vyvinul",
+    "rights_reserved": "Všechna práva vyhrazena"
+  },
+  "header": {
+    "search": "Vyhledat položky..."
+  },
+  "connection_guide": {
+    "title": "Průvodce připojením",
+    "undertitle": "Vše, co potřebujete vědět",
+    "web3": {
+      "title": "Web3 peněženky (MetaMask, Trust)",
+      "description": "Stačí zkopírovat vaši veřejnou adresu (začíná na 0x...). Vložte ji do pole pro adresu. Nikdy nezadávejte svou tajnou frázi (seed phrase) ani soukromé klíče."
+    },
+    "exchanges": {
+      "title": "Centralizované burzy",
+      "description": "Přejděte do nastavení burzy a najděte Správu API. Vygenerujte API klíč (API Key) a API Secret.",
+      "critical": "KRITICKÉ: Vždy nastavte oprávnění pouze pro čtení (ReadOnly). Z důvodu bezpečnosti zakažte výběry a obchodování."
+    },
+    "okx": {
+      "title": "Speciální požadavky OKX",
+      "description": "Na rozdíl od jiných burz vyžaduje OKX Passphrase. Je to heslo, které si vytvoříte speciálně pro daný API klíč. Musíte zadat všechny tři údaje: Key, Secret a Passphrase."
+    },
+    "analytics": {
+      "title": "Analytika a zůstatek",
+      "description": "Po připojení vaše nástěnka automaticky shromáždí všechny tokeny a vypočítá vaše celkové čisté jmění v reálném čase."
+    },
+    "button": "Jasně, jdeme na to!"
+  },
+  "logout": "odhlásit se",
+  "contact": {
+    "text": "Kontaktujte nás"
+  },
+  "profile": {
+    "title": "Osobní profil",
+    "undertitle": "Správa vaší veřejné identity",
+    "name": "zobrazované jméno",
+    "role": "profesní role",
+    "button": "Uložit změny"
+  },
+  "transactions": {
+    "title": "Nedávná aktivita",
+    "undertitle": "On-chain transakce",
+    "received": "přijato",
+    "sent": "odesláno",
+    "swap": "směna",
+    "button": "Zobrazit veškerou aktivitu"
+  },
+  "notice": {
+    "title": "Simulace Web3 aktivní",
+    "undertitle": "V současné době připojení MetaMask a Trust Wallet využívají simulované datové sady z důvodu správy nákladů na komerční API.",
+    "note": "Poznámka: Zdrojový kód obsahuje implementaci připravenou pro produkční nasazení pro Moralis a Etherscan V2. Logiku API najdete v repozitáři.",
+    "api": "logika API uvnitř"
+  },
+  "wallets": {
+    "title": "Připojené zdroje",
+    "connections": "aktivní připojení",
+    "no_wallets": "Nejsou připojeny žádné peněženky ani burzy.",
+    "no_wallets_text": "Připojte svůj první zdroj, abyste mohli pohodlně sledovat svá aktiva.",
+    "card": {
+      "title": "Můj",
+      "account": {
+        "exchange": "Učet",
+        "network": "Síť"
+      },
+      "value": "odhadovaná hodnota",
+      "live": "živé připojení"
+    },
+    "add_wallet": {
+      "title": "Připojit zdroj",
+      "inputs": {
+        "name": "název štítku",
+        "key": "api klíč",
+        "address": "adresa peněženky",
+        "secret": "api secret",
+        "passphrase": "passphrase"
+      },
+      "button": "Připojit",
+      "guide": {
+        "title": "Průvodce",
+        "undertitle": "Podrobnosti o připojení",
+        "web3": {
+          "title": "Web3 peněženky",
+          "description": "Zkopírujte svou veřejnou adresu (0x...). Nikdy nežádáme o soukromé klíče."
+        },
+        "exchanges": {
+          "title": "Burzy",
+          "description": "Zadejte svůj API klíč a Secret.",
+          "enable": "Povolte pouze oprávnění „ReadOnly“."
+        },
+        "okx": {
+          "title": "OKX Passphrase",
+          "description": "OKX vyžaduje vaše vlastní API heslo (passphrase) pro autentizaci."
+        },
+        "button": "Rozumím"
+      }
+    }
+  },
+  "total_balance": {
+    "balance": "Celkový zůstatek",
+    "live": "živá data",
+    "synchronized": "Synchronizováno"
+  },
+  "pnl": {
+    "title": "Analýza PnL",
+    "undertitle": "Metriky výkonu",
+    "profit": "Čistý zisk",
+    "rate": "Míra úspěšnosti",
+    "hold": "Prům. doba držení",
+    "hours": "h",
+    "days": "d",
+    "value_profit": "Zisk"
+  },
+  "market": {
+    "name": "Název",
+    "price": "Cena",
+    "change": "Změna 24h",
+    "month": "m",
+    "year": "r"
+  },
+  "portfolio": {
+    "title": "Přehled portfolia",
+    "undertitle": "Distribuce aktiv v reálném čase",
+    "total": "Celkové čisté jmění"
   }
 }

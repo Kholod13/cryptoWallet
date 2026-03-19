@@ -2,11 +2,14 @@ import { Handshake } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppSelector } from '../../store';
+import {useTranslation} from "react-i18next";
 
 export const Contact = () => {
     const { theme } = useAppSelector(state => state.ui);
     const [isScrolling, setIsScrolling] = useState(false);
     const isDark = theme === 'dark';
+
+    const { t } = useTranslation();
 
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout>;
@@ -72,7 +75,7 @@ export const Contact = () => {
                             <p className={`text-2xl font-black leading-tight mb-4 uppercase tracking-tighter
                                 ${isDark ? 'text-white' : 'text-slate-900'}
                             `}>
-                                Get in <span className="text-emerald-400 text-pulse">Touch</span>
+                                {t('contact.text')}
                             </p>
 
                             <div className="space-y-2">

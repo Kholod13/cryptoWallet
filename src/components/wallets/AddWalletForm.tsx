@@ -15,6 +15,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../store';
 import { fetchSourceBalances, saveSourceToDb, syncExchangeBalances } from '../../store/slices/walletSlice';
 import { motion } from "framer-motion";
+import {useTranslation} from "react-i18next";
 
 const PLATFORMS = [
     { id: 'metamask', name: 'MetaMask', type: 'web3' as const, icon: Wallet },
@@ -27,6 +28,7 @@ export const AddWalletForm = () => {
     const dispatch = useAppDispatch();
     const { theme } = useAppSelector((state) => state.ui);
     const isDark = theme === 'dark';
+    const { t } = useTranslation();
 
     // Состояние формы (объединил в один объект для handleChange)
     const [formData, setFormData] = useState({
@@ -88,7 +90,7 @@ export const AddWalletForm = () => {
 
                 <div className='flex justify-between items-center mb-8'>
                     <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        Connect Source
+                        {t('wallets.add_wallet.title')}
                     </h3>
                     <div
                         onClick={() => setIsHelpOpen(true)}
@@ -118,7 +120,7 @@ export const AddWalletForm = () => {
 
                 <div className="flex flex-col gap-4 text-left">
                     <div className="space-y-1.5 text-left">
-                        <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Label Name</label>
+                        <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('wallets.add_wallet.inputs.name')}</label>
                         <input
                             name="name"
                             placeholder="e.g. Main Wallet"
@@ -134,7 +136,7 @@ export const AddWalletForm = () => {
 
                     <div className="space-y-1.5 text-left">
                         <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                            {platform.type === 'web3' ? 'Wallet Address' : 'API Key'}
+                            {platform.type === 'web3' ? t('wallets.add_wallet.inputs.address') : t('wallets.add_wallet.inputs.key')}
                         </label>
                         <input
                             name="apiKey"
@@ -151,7 +153,7 @@ export const AddWalletForm = () => {
 
                     {platform.type === 'exchange' && (
                         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="space-y-1.5">
-                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>API Secret</label>
+                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('wallets.add_wallet.inputs.secret')}</label>
                             <input
                                 name="apiSecret"
                                 placeholder="••••••••••••"
@@ -169,7 +171,7 @@ export const AddWalletForm = () => {
 
                     {platform.id === 'okx' && (
                         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="space-y-1.5">
-                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Passphrase</label>
+                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('wallets.add_wallet.inputs.passphrase')}</label>
                             <input
                                 name="passphrase"
                                 type="password"
@@ -192,7 +194,7 @@ export const AddWalletForm = () => {
                         ${isDark ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/20' : 'bg-[#362F5E] hover:opacity-90 text-white shadow-slate-200'}
                     `}
                 >
-                    Connect {platform.name}
+                    {t('wallets.add_wallet.button')} {platform.name}
                 </button>
             </div>
 
@@ -219,9 +221,11 @@ export const AddWalletForm = () => {
                             <div>
                                 <h3 className="text-2xl font-black tracking-tight flex items-center gap-3 text-left">
                                     <Info className="text-blue-500" size={28} />
-                                    Guide
+                                    {t('wallets.add_wallet.guide.title')}
                                 </h3>
-                                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Connection Details</p>
+                                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">
+                                    {t('wallets.add_wallet.guide.undertitle')}
+                                </p>
                             </div>
                             <button onClick={() => setIsHelpOpen(false)} className="p-2 hover:bg-white/5 rounded-full cursor-pointer">
                                 <X size={24} className="text-slate-400" />
@@ -234,9 +238,9 @@ export const AddWalletForm = () => {
                                     <Wallet size={24}/>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-lg">Web3 Wallets</h4>
+                                    <h4 className="font-bold text-lg">{t('wallets.add_wallet.guide.web3.title')}</h4>
                                     <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        Copy your <span className="font-mono font-bold text-blue-500">Public Address</span> (0x...). We never ask for private keys.
+                                        {t('wallets.add_wallet.guide.web3.description')}
                                     </p>
                                 </div>
                             </div>
@@ -246,14 +250,14 @@ export const AddWalletForm = () => {
                                     <Key size={24}/>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-lg">Exchanges</h4>
+                                    <h4 className="font-bold text-lg">{t('wallets.add_wallet.guide.exchanges.title')}</h4>
                                     <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        Provide your <span className="font-bold text-emerald-500">API Key</span> and <span className="font-bold text-emerald-500">Secret</span>.
+                                        {t('wallets.add_wallet.guide.exchanges.description')}
                                     </p>
                                     <div className="mt-3 p-3 bg-amber-500/5 rounded-xl border border-amber-500/10 flex items-start gap-3">
                                         <ShieldCheck size={18} className="text-amber-500 shrink-0 mt-0.5" />
                                         <p className="text-[11px] text-amber-600 italic font-medium leading-tight">
-                                            Enable <b>"Read-only"</b> permissions only.
+                                            {t('wallets.add_wallet.guide.exchanges.enable')}
                                         </p>
                                     </div>
                                 </div>
@@ -264,9 +268,9 @@ export const AddWalletForm = () => {
                                     <Lock size={24}/>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-lg">OKX Passphrase</h4>
+                                    <h4 className="font-bold text-lg">{t('wallets.add_wallet.guide.okx.title')}</h4>
                                     <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        OKX requires your custom API <b>Passphrase</b> for authentication.
+                                        {t('wallets.add_wallet.guide.okx.description')}
                                     </p>
                                 </div>
                             </div>
@@ -278,7 +282,7 @@ export const AddWalletForm = () => {
                                 ${isDark ? 'bg-blue-600' : 'bg-[#362F5E]'}
                             `}
                         >
-                            Got it
+                            {t('wallets.add_wallet.guide.button')}
                         </button>
                     </motion.div>
                 </div>,

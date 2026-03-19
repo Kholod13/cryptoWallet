@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../store";
 import { logout } from '../../store/slices/authSlice';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { motion } from 'framer-motion';
+import {useTranslation} from "react-i18next";
 
 export const Logout = () => {
     const dispatch = useAppDispatch();
@@ -11,6 +12,8 @@ export const Logout = () => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
     const isDark = theme === 'dark';
+
+    const { t } = useTranslation();
 
     const handleLogout = () => {
         dispatch(logout());
@@ -45,7 +48,7 @@ export const Logout = () => {
                     <p className={`text-xl font-black uppercase tracking-widest transition-colors duration-500
                         ${isDark ? 'text-white' : 'text-[#362F5E]'}
                     `}>
-                        Logout
+                        {t('logout')}
                     </p>
 
                     {/* Декоративный блик для темной темы */}

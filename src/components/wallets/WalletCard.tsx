@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import { deleteSourceFromDb, fetchSourceBalances, syncExchangeBalances } from '../../store/slices/walletSlice';
 import { addToast } from '../../store/slices/toastSlice';
 import { motion } from 'framer-motion';
+import {useTranslation} from "react-i18next";
 
 const currencySymbols: Record<string, string> = {
     USD: '$', EUR: '€', CZK: 'Kč', UAH: '₴'
@@ -16,6 +17,8 @@ interface WalletCardProps {
 
 export const WalletCard = ({ wallet }: WalletCardProps) => {
     const dispatch = useAppDispatch();
+
+    const { t } = useTranslation();
 
     // Достаем тему и данные для расчетов
     const { theme } = useAppSelector(state => state.ui);
@@ -96,10 +99,10 @@ export const WalletCard = ({ wallet }: WalletCardProps) => {
                         </div>
                         <div>
                             <h4 className={`font-black text-lg leading-none transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                                {wallet.label}
+                                {t('wallets.card.title')} {wallet.platform.toUpperCase()}
                             </h4>
                             <p className="text-slate-500 text-[10px] font-bold uppercase mt-1 tracking-widest">
-                                {wallet.platform} {wallet.type === 'exchange' ? 'Account' : 'Network'}
+                                {wallet.platform} {wallet.type === 'exchange' ? t('wallets.card.account.exchange') : t('wallets.card.account.network')}
                             </p>
                         </div>
                     </div>
@@ -122,7 +125,7 @@ export const WalletCard = ({ wallet }: WalletCardProps) => {
 
                 {/* СРЕДНЯЯ ЧАСТЬ: БАЛАНС */}
                 <div className="my-4 relative z-10">
-                    <p className="text-slate-500 text-[9px] font-black uppercase tracking-tighter mb-1 opacity-70">Estimated Value</p>
+                    <p className="text-slate-500 text-[9px] font-black uppercase tracking-tighter mb-1 opacity-70">{t('wallets.card.value')}</p>
                     <h3 className={`text-3xl font-black tracking-tighter tabular-nums transition-colors ${isDark ? 'text-white' : 'text-[#362F5E]'}`}>
                         {wallet.isLoading ? (
                             <span className="text-slate-500 animate-pulse text-xl uppercase font-bold tracking-widest">Scanning...</span>
@@ -158,7 +161,7 @@ export const WalletCard = ({ wallet }: WalletCardProps) => {
                     {wallet.type === 'exchange' ? (
                         <span className="text-emerald-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                            Live Connection
+                            {t('wallets.card.live')}
                         </span>
                     ) : (
                         <>

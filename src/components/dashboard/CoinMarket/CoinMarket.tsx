@@ -5,6 +5,7 @@ import { fetchCoins } from '../../../store/slices/marketSlice.ts';
 import { TrendingUp, TrendingDown, AreaChart as ChartIcon, RefreshCcw } from 'lucide-react';
 import { AnimatePresence, motion } from "framer-motion";
 import { CoinChartModal } from "./CoinChartModel.tsx";
+import {useTranslation} from "react-i18next";
 
 const currencySymbols: Record<string, string> = {
     USD: '$', EUR: '€', CZK: 'Kč', UAH: '₴'
@@ -15,6 +16,7 @@ const CoinMarket = () => {
     const { coins, isLoading, error, fiatRates } = useAppSelector((state) => state.market);
     const { theme } = useAppSelector((state) => state.ui);
     const user = useAppSelector((state) => state.auth.user);
+    const { t } = useTranslation();
 
     const isDark = theme === 'dark';
     const mainCurrency = user?.mainCurrency || 'USD';
@@ -66,9 +68,9 @@ const CoinMarket = () => {
                                     </motion.div>
                                 </button>
                             </th>
-                            <th className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Name</th>
-                            <th className={`text-right text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Price</th>
-                            <th className={`text-right text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>24h Change</th>
+                            <th className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('market.name')}</th>
+                            <th className={`text-right text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('market.price')}</th>
+                            <th className={`text-right text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('market.change')}</th>
                             <th className="p-4 text-right"></th>
                         </tr>
                         </thead>

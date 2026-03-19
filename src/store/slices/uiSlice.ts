@@ -1,23 +1,18 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-type ThemeMode = 'light' | 'dark';
 // Available languages
 export type LanguageMode = 'EN' | 'CZ' | 'UA';
 
 interface UIState {
-    pageTitle: string;
-    theme: ThemeMode;
+    pageTitleKey: string; // Храним ключ, а не текст!
+    theme: 'light' | 'dark';
     language: LanguageMode;
 }
 
-// Take saved data from browser memory
-const savedTheme = localStorage.getItem('app_theme') as ThemeMode;
-const savedLang = localStorage.getItem('app_lang') as LanguageMode;
-
 const initialState: UIState = {
-    pageTitle: 'Dashboard',
-    theme: savedTheme || 'light',
-    language: savedLang || 'EN', // default
+    pageTitleKey: 'common.dashboard',
+    theme: (localStorage.getItem('app_theme') as any) || 'light',
+    language: (localStorage.getItem('app_lang') as LanguageMode) || 'EN',
 }
 
 const uiSlice = createSlice({
@@ -25,19 +20,18 @@ const uiSlice = createSlice({
     initialState,
     reducers: {
         setPageTitle: (state, action: PayloadAction<string>) => {
-            state.pageTitle = action.payload;
+            state.pageTitleKey = action.payload;
         },
-        setTheme: (state, action: PayloadAction<ThemeMode>) => {
-            state.theme = action.payload;
-            localStorage.setItem('app_theme', action.payload);
-        },
-        // Action for switching language
         setLanguage: (state, action: PayloadAction<LanguageMode>) => {
             state.language = action.payload;
             localStorage.setItem('app_lang', action.payload);
+        },
+        setTheme: (state, action: PayloadAction<'light' | 'dark'>) => {
+            state.theme = action.payload;
+            localStorage.setItem('app_theme', action.payload);
         }
     }
-})
+});
 
-export const { setPageTitle, setTheme, setLanguage } = uiSlice.actions;
+export const { setPageTitle, setLanguage, setTheme } = uiSlice.actions;
 export default uiSlice.reducer;

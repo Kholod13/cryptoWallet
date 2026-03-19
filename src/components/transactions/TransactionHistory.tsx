@@ -8,6 +8,7 @@ import {
     Clock,
     ExternalLink
 } from 'lucide-react';
+import {useTranslation} from "react-i18next";
 
 const MOCK_TRANSACTIONS = [
     { id: '1', type: 'received', asset: 'BTC', amount: 0.025, status: 'success', date: '2026-03-11T14:20:00', hash: '0x74a...f2e' },
@@ -25,6 +26,8 @@ export const TransactionHistory = () => {
     const { theme } = useAppSelector(state => state.ui);
     const { user } = useAppSelector(state => state.auth);
     const { coins, fiatRates } = useAppSelector(state => state.market);
+
+    const { t } = useTranslation();
 
     const isDark = theme === 'dark';
     const mainCurrency = user?.mainCurrency || 'USD';
@@ -51,9 +54,11 @@ export const TransactionHistory = () => {
                             <h3 className={`text-2xl font-black tracking-tight transition-colors duration-500
                                 ${isDark ? 'text-white' : 'text-slate-900'}
                             `}>
-                                Recent Activity
+                                {t('transactions.title')}
                             </h3>
-                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">On-chain Transactions</p>
+                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">
+                                {t('transactions.undertitle')}
+                            </p>
                         </div>
                         <button className={`p-3 rounded-2xl border transition-all cursor-pointer
                             ${isDark ? 'bg-white/5 border-white/5 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-900'}
@@ -97,7 +102,7 @@ export const TransactionHistory = () => {
                                                     <p className={`font-black text-sm uppercase tracking-tight transition-colors duration-500
                                                         ${isDark ? 'text-white' : 'text-slate-800'}
                                                     `}>
-                                                        {tx.type} {tx.asset}
+                                                        {t(`transactions.${tx.type}`)} {tx.asset}
                                                     </p>
                                                     {tx.status === 'success' ?
                                                         <CheckCircle2 size={12} className="text-emerald-500/50" /> :
@@ -133,7 +138,7 @@ export const TransactionHistory = () => {
                         ? 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10'
                         : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-100'}
                     `}>
-                        See All Activity
+                        {t('transactions.button')}
                     </button>
                 </div>
 

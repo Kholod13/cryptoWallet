@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, Code2, X } from 'lucide-react';
 import { useAppSelector } from '../../store';
+import {useTranslation} from "react-i18next";
 
 export const ApiNotice = () => {
     const { theme } = useAppSelector(state => state.ui);
     const [isVisible, setIsVisible] = useState(true);
+
+    const { t } = useTranslation();
 
     return (
         <AnimatePresence>
@@ -44,14 +47,12 @@ export const ApiNotice = () => {
                         {/* ТЕКСТОВАЯ ЧАСТЬ */}
                         <div className="flex-1 text-center md:text-left pr-4">
                             <h4 className={`text-lg font-black tracking-tight mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                                Web3 Simulation Active
+                                {t('notice.title')}
                             </h4>
                             <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-                                Currently, <span className="font-bold text-blue-500">MetaMask</span> and <span className="font-bold text-blue-500">Trust Wallet</span> connections use
-                                simulated datasets to manage commercial API costs.
+                                {t('notice.undertitle')}
                                 <span className="block mt-2 italic opacity-80">
-                                    Note: The underlying source code includes a production-ready implementation for Moralis and Etherscan V2.
-                                    Check the repository for API logic.
+                                    {t('notice.note')}
                                 </span>
                             </p>
                         </div>
@@ -62,7 +63,7 @@ export const ApiNotice = () => {
                                 ${theme === 'dark' ? 'border-white/10 bg-white/5 text-slate-400' : 'border-slate-200 bg-slate-100 text-slate-500'}
                             `}>
                                 <Code2 size={14} />
-                                API logic inside
+                                {t('notice.api')}
                             </div>
                         </div>
                     </div>

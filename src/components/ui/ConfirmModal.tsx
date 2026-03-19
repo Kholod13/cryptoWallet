@@ -52,7 +52,7 @@ export const ConfirmModal = ({
                                 <AlertTriangle size={32} />
                             </div>
 
-                            <h3 className="text-xl font-black text-white mb-2">{title}</h3>
+                            <h3 className="text-xl font-black text-white mb-2" style={{color: 'white'}}>{title}</h3>
                             <p className="text-slate-400 text-sm leading-relaxed mb-8">
                                 {description}
                             </p>

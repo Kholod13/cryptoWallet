@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import { Wallet, TrendingUp, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fetchSourceBalances, syncExchangeBalances } from "../../store/slices/walletSlice.ts";
+import {useTranslation} from "react-i18next";
 
 const currencySymbols: Record<string, string> = {
     USD: '$', EUR: '€', CZK: 'Kč', UAH: '₴'
@@ -21,6 +22,8 @@ export const MainBalance = () => {
     const mainCurrency = user?.mainCurrency || 'USD';
     const rate = fiatRates[mainCurrency] || 1;
     const [isVisible, setIsVisible] = React.useState(true);
+
+    const { t } = useTranslation();
 
     const totalBalance = useMemo(() => {
         const totalUSD = connectedWallets.reduce((total, wallet) => {
@@ -83,7 +86,7 @@ export const MainBalance = () => {
                                 <Wallet size={18} />
                             </div>
                             <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white/60' : 'text-slate-500'}`}>
-                                Total Balance
+                                {t("total_balance.balance")}
                             </span>
                         </div>
                         <button
@@ -131,7 +134,7 @@ export const MainBalance = () => {
                         <TrendingUp size={10} className={isDark ? 'text-slate-900' : 'text-white'} />
                     </div>
                     <p className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-white' : 'text-slate-600'}`}>
-                        Live Data <span className="opacity-50 ml-1 font-bold italic">synchronized</span>
+                        {t("total_balance.live")} <span className="opacity-50 ml-1 font-bold italic">{t("total_balance.synchronized")}</span>
                     </p>
                 </div>
             </div>

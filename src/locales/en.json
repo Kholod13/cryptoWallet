@@ -2,9 +2,132 @@
   "common": {
     "dashboard": "Dashboard",
     "wallets": "Wallets",
-    "settings": "Settings",
-    "total_balance": "Total Balance",
-    "recent_activity": "Recent Activity",
-    "save": "Save Changes"
+    "transactions": "Transactions",
+    "settings": "Settings"
+  },
+  "navbar": {
+    "developed_by": "Developed by",
+    "rights_reserved": "All Rights Reserved"
+  },
+  "header": {
+    "search": "Search assets..."
+  },
+  "connection_guide": {
+    "title": "Connection Guide",
+    "undertitle": "Everything you need to know",
+    "web3": {
+      "title": "Web3 Wallets (MetaMask, Trust)",
+      "description": "Just copy your Public Address (starts with 0x...). Paste it into the address field. Never enter your recovery phrase or private keys."
+    },
+    "exchanges": {
+      "title": "Centralized Exchanges",
+      "description": "Go to your Exchange settings and find API Management. Generate an API Key and API Secret.",
+      "critical": "CRITICAL: Always set permissions to \"Read-only\". Disable Withdrawals and Trading for security."
+    },
+    "okx": {
+      "title": "OKX Special Requirements",
+      "description": "Unlike other exchanges, OKX requires a Passphrase. This is a password you create specifically for the API key. You must provide all three: Key, Secret, and Passphrase."
+    },
+    "analytics": {
+      "title": "Analytics & Balance",
+      "description": "Once connected, your dashboard will automatically aggregate all tokens and calculate your Total Net Worth in real-time."
+    },
+    "button": "GOT IT, LET'S TRACK!"
+  },
+  "logout": "logout",
+  "contact": {
+    "text": "Get in Touch"
+  },
+  "profile": {
+    "title": "Personal Profile",
+    "undertitle": "Manage your public identity",
+    "name": "display name",
+    "role": "professional role",
+    "button": "Save Changes"
+  },
+  "transactions": {
+    "title": "Recent Activity",
+    "undertitle": "On-chain Transactions",
+    "received": "received",
+    "sent": "sent",
+    "swap": "swap",
+    "button": "See all activity"
+  },
+  "notice": {
+    "title": "Web3 Simulation Active",
+    "undertitle": "Currently, MetaMask and Trust Wallet connections use simulated datasets to manage commercial API costs.",
+    "note": "Note: The underlying source code includes a production-ready implementation for Moralis and Etherscan V2. Check the repository for API logic.",
+    "api": "api logic inside"
+  },
+  "wallets": {
+    "title": "Connected Sources",
+    "connections": "active connections",
+    "no_wallets": "No wallets or exchanges connected.",
+    "no_wallets_text": "Connect your first source to comfortable track your assets.",
+    "card": {
+      "title": "My",
+      "account": {
+        "exchange": "Account",
+        "network": "network"
+      },
+      "value": "estimated value",
+      "live": "live connection"
+    },
+    "add_wallet": {
+      "title": "Connect Source",
+      "inputs": {
+        "name": "label name",
+        "key": "api key",
+        "address": "wallet address",
+        "secret": "api secret",
+        "passphrase": "passphrase"
+      },
+      "button": "Connect",
+      "guide": {
+        "title": "Guide",
+        "undertitle": "Connection details",
+        "web3": {
+          "title": "Web3 Wallets",
+          "description": "Copy your Public Address (0x...). We never ask for private keys."
+        },
+        "exchanges": {
+          "title": "Exchanges",
+          "description": "Provide your API Key and Secret.",
+          "enable": "Enable \"Read-only\" permissions only."
+        },
+        "okx": {
+          "title": "OKX Passphrase",
+          "description": "OKX requires your custom API Passphrase for authentification"
+        },
+        "button": "Got it"
+      }
+    }
+  },
+  "total_balance": {
+    "balance": "Total Balance",
+    "live": "live data",
+    "synchronized": "Synchronized"
+  },
+  "pnl": {
+    "title": "PnL Analysis",
+    "undertitle": "Performance metrics",
+    "profit": "Net Profit",
+    "rate": "Win Rate",
+    "hold": "Avg Hold",
+    "hours": "h",
+    "days": "d",
+    "value_profit": "Profit"
+  },
+  "market": {
+    "name": "Name",
+    "price": "Price",
+    "change": "24H Change",
+    "month": "m",
+    "year": "y"
+  },
+  "portfolio": {
+    "title": "Portfolio Insight",
+    "undertitle": "Live Asset Distribution",
+    "total": "Total Net Worth"
   }
 }

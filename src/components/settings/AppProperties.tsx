@@ -38,6 +38,7 @@ export const AppProperties = () => {
     ];
 
     const handleLanguageChange = (code: LanguageMode) => {
+        console.log("Смена языка на:", code);
         // 3. Меняем язык в самой библиотеке
         i18n.changeLanguage(code);
         // 4. Сохраняем в Redux/LocalStorage

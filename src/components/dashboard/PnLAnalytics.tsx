@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAppSelector } from '../../store';
 import { AreaChart, Area, ResponsiveContainer, YAxis, Tooltip } from 'recharts';
 import { TrendingUp, TrendingDown, Clock, Target, Zap } from 'lucide-react';
+import {useTranslation} from "react-i18next";
 
 const MOCK_SERIES = {
     "24h": [10, 15, 12, 18, 25, 22, 30],
@@ -18,6 +19,7 @@ export const PnLAnalytics = () => {
     const { user } = useAppSelector(state => state.auth);
     const { fiatRates } = useAppSelector(state => state.market);
     const { theme } = useAppSelector(state => state.ui);
+    const { t } = useTranslation();
 
     const isDark = theme === 'dark';
     const mainCurrency = user?.mainCurrency || 'USD';
@@ -55,9 +57,9 @@ export const PnLAnalytics = () => {
                                 ${isDark ? 'text-white' : 'text-slate-900'}
                             `}>
                                 <Zap className={isProfit ? "text-emerald-400" : "text-rose-400"} size={20} fill="currentColor" fillOpacity={0.2} />
-                                PnL Analysis
+                                {t('pnl.title')}
                             </h3>
-                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Performance Metrics</p>
+                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{t('pnl.undertitle')}</p>
                         </div>
 
                         <div className={`flex p-1 rounded-xl border transition-colors
@@ -82,7 +84,7 @@ export const PnLAnalytics = () => {
                     {/* ЦЕНТРАЛЬНЫЙ ПОКАЗАТЕЛЬ */}
                     <div className="mb-6">
                         <div className="flex items-center gap-3 mb-1">
-                            <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Net Profit</span>
+                            <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{t('pnl.profit')}</span>
                             <div className={`flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full
                                 ${isProfit ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}
                             `}>
@@ -122,7 +124,7 @@ export const PnLAnalytics = () => {
                                     // Используем тип any для значения, чтобы не конфликтовать с внутренними типами Recharts
                                     formatter={(val: any) => [
                                         `${Number(val || 0).toLocaleString()} ${mainCurrency}`,
-                                        'Profit'
+                                        t('pnl.value_profit')
                                     ]}
                                 />
                                 <Area
@@ -141,8 +143,8 @@ export const PnLAnalytics = () => {
                     {/* СЕТКА АНАЛИТИКИ */}
                     <div className="grid grid-cols-2 gap-3 mt-6">
                         {[
-                            { label: "Win Rate", value: "64.2%", icon: Target },
-                            { label: "Avg Hold", value: "12 Days", icon: Clock }
+                            { label: t('pnl.rate'), value: "64.2%", icon: Target },
+                            { label: t('pnl.hold'), value: `12 ${t('pnl.days').toUpperCase()}`, icon: Clock }
                         ].map((stat, i) => (
                             <div key={i} className={`p-3 rounded-2xl border transition-all
                                 ${isDark ? 'bg-white/[0.03] border-white/5' : 'bg-slate-50 border-slate-100'}

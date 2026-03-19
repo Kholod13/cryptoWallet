@@ -4,6 +4,7 @@ import { useAppSelector } from '../../store';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity } from 'lucide-react';
+import {useTranslation} from "react-i18next";
 
 const COLORS = ['#10B981', '#3B82F6', '#6366F1', '#F59E0B', '#EF4444', '#8B5CF6'];
 
@@ -16,6 +17,7 @@ export const AggregatedAssets = () => {
     const { coins, fiatRates } = useAppSelector(state => state.market);
     const { user } = useAppSelector(state => state.auth);
     const { theme } = useAppSelector(state => state.ui);
+    const { t } = useTranslation();
 
     const isDark = theme === 'dark';
     const mainCurrency = user?.mainCurrency || 'USD';
@@ -136,13 +138,15 @@ export const AggregatedAssets = () => {
                                     <Activity className={isDark ? "text-emerald-400" : "text-emerald-600"} size={20} />
                                 </div>
                                 <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                                    Portfolio Insight
+                                    {t('portfolio.title')}
                                 </h3>
                             </div>
-                            <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.2em] ml-1">Live Asset Distribution</p>
+                            <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.2em] ml-1">
+                                {t('portfolio.undertitle')}
+                            </p>
                         </div>
                         <div className="text-right">
-                            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Total Net Worth</p>
+                            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">{t('portfolio.total')}</p>
                             <p className={`text-2xl font-black tabular-nums ${isDark ? 'text-white' : 'text-[#362F5E]'}`}>
                                 {totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} <span className={isDark ? "text-blue-500" : "text-blue-600"}>{mainCurrency}</span>
                             </p>
@@ -151,7 +155,7 @@ export const AggregatedAssets = () => {
 
                     <div className="flex flex-col lg:flex-row gap-10 items-center">
                         {/* ДИАГРАММА */}
-                        <div className="w-full lg:w-1/2 h-[400px] relative flex items-center justify-center outline-none ring-0">
+                        <div className="w-full lg:w-1/2 h-[400px] min-h-[400px] relative flex items-center justify-center outline-none ring-0">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
