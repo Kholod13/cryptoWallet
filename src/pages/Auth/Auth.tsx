@@ -75,10 +75,10 @@ const AuthPage = () => {
                 <div className="flex items-center justify-center mb-3">
                     <Logo/>
                 </div>
-                <h2 className="text-3xl font-black text-white mb-2 text-center">
+                <p className="text-3xl font-black text-white mb-2 text-center" style={{ color: 'white' }}>
                     {isLogin ? 'Welcome Back' : 'Create Account'}
-                </h2>
-                <p className="text-slate-400 text-center mb-8 text-sm">
+                </p>
+                <p className="text-slate-400 text-center mb-8 text-sm" style={{ color: 'white' }}>
                     {isLogin ? 'Log in to manage your crypto' : 'Join us and start tracking your assets'}
                 </p>
 
@@ -152,7 +152,7 @@ const AuthPage = () => {
                 </form>
 
                 <div className="mt-8 text-center text-sm">
-                    <span className="text-slate-500">
+                    <span className="text-slate-500" style={{ color: 'white' }}>
                         {isLogin ? "Don't have an account? " : "Already have an account? "}
                     </span>
                     <button

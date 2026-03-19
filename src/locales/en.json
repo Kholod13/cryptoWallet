@@ -1,0 +1,10 @@
+{
+  "common": {
+    "dashboard": "Dashboard",
+    "wallets": "Wallets",
+    "settings": "Settings",
+    "total_balance": "Total Balance",
+    "recent_activity": "Recent Activity",
+    "save": "Save Changes"
+  }
+}

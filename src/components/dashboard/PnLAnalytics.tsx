@@ -33,11 +33,7 @@ export const PnLAnalytics = () => {
 
     return (
         /* 1. ВНЕШНЯЯ ГРАДИЕНТНАЯ РАМКА */
-        <div className={`relative p-[1px] rounded-[48px] overflow-hidden transition-all duration-500 shadow-2xl h-full w-full
-            ${isDark
-            ? 'bg-gradient-to-b from-white/10 to-transparent shadow-black/20'
-            : 'bg-gradient-to-b from-slate-200 to-white shadow-slate-200'}
-        `}>
+        <div className={`relative p-[1px] rounded-[48px] overflow-hidden transition-all duration-500 shadow-2xl h-full w-full`}>
             {/* 2. ГЛАВНЫЙ КОНТЕЙНЕР (Стекло) */}
             <div className={`relative z-10 rounded-[47px] p-8 h-full overflow-hidden flex flex-col transition-colors duration-500
                 ${isDark ? 'bg-[#0D0F14]/90' : 'bg-white/80'}

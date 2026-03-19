@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 
-interface User {
+export interface User {
     id: string;
     username: string;
     email: string;
@@ -8,6 +8,7 @@ interface User {
     profession: string | null;
     mainCurrency: string;
     theme: string;
+    language: string; // <--- ДОБАВИЛИ ПОЛЕ ЯЗЫКА
 }
 
 interface AuthState {
@@ -26,7 +27,7 @@ const initialState: AuthState = {
 
 // --- АСИНХРОННЫЕ ЭКШЕНЫ ---
 
-// 1. Регистрация (ДОБАВЛЕНО)
+// 1. Регистрация
 export const registerUser = createAsyncThunk(
     'auth/register',
     async (userData: any, { rejectWithValue }) => {
@@ -40,7 +41,7 @@ export const registerUser = createAsyncThunk(
             if (!response.ok) return rejectWithValue(data.message || 'Registration failed');
 
             localStorage.setItem('token', data.token);
-            return data; // Ожидаем { user, token }
+            return data;
         } catch (err: any) {
             return rejectWithValue("Server error");
         }
@@ -61,7 +62,7 @@ export const loginUser = createAsyncThunk(
             if (!response.ok) return rejectWithValue(data.message || 'Login failed');
 
             localStorage.setItem('token', data.token);
-            return data; // Ожидаем { user, token }
+            return data;
         } catch (err: any) {
             return rejectWithValue("Server error");
         }
@@ -86,7 +87,7 @@ export const fetchMe = createAsyncThunk('auth/fetchMe', async (_, { rejectWithVa
     }
 });
 
-// 4. Обновление профиля
+// 4. Обновление профиля (универсальный метод для авы, темы, валюты и языка)
 export const updateProfile = createAsyncThunk('auth/updateProfile', async (updateData: Partial<User>, { rejectWithValue }) => {
     try {
         const token = localStorage.getItem('token');
@@ -148,7 +149,6 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.error = null;
             })
-            // Глобальные матчеры для всех асинхронных экшенов этого слайса
             .addMatcher(action => action.type.endsWith('/pending'), (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -157,7 +157,6 @@ const authSlice = createSlice({
                 (action) => action.type.endsWith('/rejected'),
                 (state, action) => {
                     state.isLoading = false;
-                    // Используем принудительное приведение типа (Type Casting)
                     state.error = (action as PayloadAction<string>).payload || 'Error';
                 }
             );

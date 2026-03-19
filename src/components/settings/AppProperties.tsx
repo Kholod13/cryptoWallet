@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateProfile } from '../../store/slices/authSlice';
 import { setLanguage, type LanguageMode, setTheme } from '../../store/slices/uiSlice';
+import {useTranslation} from "react-i18next";
 
 const currencySymbols: Record<string, string> = {
     USD: '$', EUR: '€', CZK: 'Kč', UAH: '₴'
@@ -11,6 +12,8 @@ const currencySymbols: Record<string, string> = {
 
 export const AppProperties = () => {
     const dispatch = useAppDispatch();
+
+    const { i18n } = useTranslation();
 
     const user = useAppSelector((state) => state.auth.user);
     const { theme, language } = useAppSelector((state) => state.ui);
@@ -33,6 +36,16 @@ export const AppProperties = () => {
         { code: 'CZ', name: 'Čeština' },
         { code: 'UA', name: 'Українська' }
     ];
+
+    const handleLanguageChange = (code: LanguageMode) => {
+        // 3. Меняем язык в самой библиотеке
+        i18n.changeLanguage(code);
+        // 4. Сохраняем в Redux/LocalStorage
+        dispatch(setLanguage(code));
+        // 5. Сохраняем в базу профиля
+        dispatch(updateProfile({ language: code }));
+        setLangOpen(false);
+    };
 
     return (
         /* 1. ВНЕШНЯЯ ГРАДИЕНТНАЯ РАМКА (p-[1px]) */
@@ -79,10 +92,7 @@ export const AppProperties = () => {
                                             : (isDark ? 'text-slate-300 hover:bg-white/5' : 'text-slate-600 hover:bg-slate-50')
                                         }
                                         `}
-                                        onClick={() => {
-                                            dispatch(setLanguage(lang.code as LanguageMode));
-                                            setLangOpen(false);
-                                        }}
+                                        onClick={() => handleLanguageChange(lang.code as LanguageMode)}
                                     >
                                         <span>{lang.name}</span>
                                         <span className="opacity-40 text-[9px] uppercase">{lang.code}</span>

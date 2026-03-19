@@ -11,11 +11,13 @@ import {useEffect} from "react";
 import {fetchMe} from './store/slices/authSlice'
 import {fetchSourceBalances, fetchUserSources, syncExchangeBalances} from "./store/slices/walletSlice.ts";
 import {setTheme} from "./store/slices/uiSlice.ts";
+import {useTranslation} from "react-i18next";
 
 function App() {
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.auth.user);
     const token = useAppSelector(state => state.auth.token);
+    const { i18n } = useTranslation();
 
     const { connectedWallets } = useAppSelector(state => state.wallet);
 
@@ -25,6 +27,12 @@ function App() {
             dispatch(setTheme(user.theme as 'light' | 'dark'));
         }
     }, [user?.theme, dispatch]);
+
+    useEffect(() => {
+        if (user?.language) {
+            i18n.changeLanguage(user.language);
+        }
+    }, [user?.language]);
 
     useEffect(() => {
         if (connectedWallets.length > 0) {

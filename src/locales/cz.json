@@ -1,0 +1,10 @@
+{
+  "common": {
+    "dashboard": "Nástěnka",
+    "wallets": "Peněženky",
+    "settings": "Nastavení",
+    "total_balance": "Celkový zůstatek",
+    "recent_activity": "Nedávná aktivita",
+    "save": "Uložit změny"
+  }
+}

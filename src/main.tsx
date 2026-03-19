@@ -5,6 +5,8 @@ import App from './App.tsx'
 import {store} from './store' //redux
 import {Provider} from 'react-redux' //redux
 import {ToastContainer} from "./components/ui/ToastContainer.tsx";
+//for translation application
+import './i18n';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

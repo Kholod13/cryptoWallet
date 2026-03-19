@@ -18,6 +18,7 @@ model User {
   profession   String?
   mainCurrency String   @default("USD")
   theme        String   @default("light")
+  language     String   @default("EN")
   accounts     Account[] // Связь с кошельками и биржами
   createdAt    DateTime @default(now())
 }

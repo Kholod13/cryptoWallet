@@ -3,13 +3,14 @@ import {
     Search, Bell, Trophy, UserRoundIcon, CircleHelp, X, Info, ShieldCheck, Key, Lock, Wallet, PieChart
 } from 'lucide-react';
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+//import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from 'framer-motion';
-import { type RootState, useAppSelector } from '../../store/';
+import { /*type RootState,*/ useAppSelector } from '../../store/';
 import { createPortal } from 'react-dom';
+import {useTranslation} from "react-i18next";
 
 export const Header = () => {
-    const title = useSelector((state: RootState) => state.ui.pageTitle);
+    //const title = useSelector((state: RootState) => state.ui.pageTitle);
     const { theme } = useAppSelector((state) => state.ui);
     const user = useAppSelector((state) => state.auth.user);
 
@@ -20,6 +21,8 @@ export const Header = () => {
     const profession = user?.profession || 'User';
     const tempAvatar = user?.avatarUrl || '';
 
+    const { t } = useTranslation();
+
     return (
         <header className={`
             flex px-8 py-4 justify-between items-center sticky top-0 z-[100] transition-all duration-500 border-b
@@ -29,7 +32,7 @@ export const Header = () => {
             {/* Title */}
             <div className="w-1/4">
                 <h1 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-800'}`}>
-                    {title}
+                    {t('common.dashboard')}
                 </h1>
             </div>
 

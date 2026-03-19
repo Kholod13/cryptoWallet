@@ -1,0 +1,10 @@
+{
+  "common": {
+    "dashboard": "Панель",
+    "wallets": "Гаманці",
+    "settings": "Налаштування",
+    "total_balance": "Загальний баланс",
+    "recent_activity": "Останні транзакції",
+    "save": "Зберегти зміни"
+  }
+}
