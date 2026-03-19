@@ -6,9 +6,8 @@ import { setPageTitle } from "../../store/slices/uiSlice.ts";
 import Logo from '../ui/Logo.tsx';
 import { motion } from 'framer-motion';
 import { useAppSelector } from '../../store';
-import { useTranslation } from 'react-i18next'; // 1. Импортируем хук
+import { useTranslation } from 'react-i18next';
 
-// 2. В массиве теперь храним ключи (например, 'common.dashboard')
 const NAV_ITEMS = [
     {id: 'dashboard', labelKey: 'common.dashboard', path: '/dashboard', icon: LayoutDashboard},
     {id: 'wallets', labelKey: 'common.wallets', path: '/wallets', icon: Wallet},
@@ -17,93 +16,91 @@ const NAV_ITEMS = [
 ];
 
 export const Navbar = () => {
-    const { t } = useTranslation(); // 3. Инициализируем перевод
+    const { t } = useTranslation();
     const dispatch = useDispatch();
-
     const { theme } = useAppSelector(state => state.ui);
     const isDark = theme === 'dark';
 
     return (
-        <nav className="flex flex-col p-4 overflow-hidden">
-            <div className="flex flex-col flex-1">
-                {/* Logotype - заголовок тоже переводим при клике */}
+        <nav className={`
+            /* Мобилка: фиксированная панель внизу */
+            fixed bottom-0 left-0 w-full h-20 flex flex-row border-t z-[1000]
+            
+            /* Десктоп: боковая панель */
+            lg:sticky lg:top-0 lg:left-0 lg:w-72 lg:h-screen lg:flex-col lg:border-r lg:border-t-0
+            
+            backdrop-blur-xl transition-all duration-500
+            ${isDark
+            ? 'bg-[#0D0F14]/80 border-white/5'
+            : 'bg-white/80 border-slate-200 shadow-[0_-10px_30px_rgba(0,0,0,0.03)]'}
+        `}>
+
+            <div className="flex flex-row lg:flex-col flex-1 w-full lg:p-4">
+
+                {/* Логотип: скрываем на мобилках, так как он есть в Хедере */}
                 <NavLink
-                    className="flex items-center gap-2 px-2 mb-10 mt-6"
+                    className="hidden lg:flex items-center gap-3 px-4 mb-10 mt-6 group"
                     to={'/dashboard'}
-                    onClick={() => dispatch(setPageTitle(t('common.dashboard')))}
+                    onClick={() => dispatch(setPageTitle('common.dashboard'))}
                 >
-                    <Logo className="w-10 h-10" />
-                    <h1 className="text-[#362f5e] text-2xl font-black tracking-tighter leading-none">
+                    <Logo className="w-10 h-10 transition-transform group-hover:rotate-12" />
+                    <h1 className={`text-2xl font-black tracking-tighter leading-none transition-colors ${isDark ? 'text-white' : 'text-[#362f5e]'}`}>
                         SYNC<span className="text-emerald-400">SPACE</span>
                     </h1>
                 </NavLink>
 
-                {/* List of pages */}
-                <ul className="flex flex-col gap-3 flex-auto">
+                {/* Список страниц */}
+                <ul className="flex flex-row lg:flex-col justify-around lg:justify-start items-center w-full px-2 lg:px-0 lg:gap-3">
                     {NAV_ITEMS.map((item) => (
-                        <li key={item.id}>
+                        <li key={item.id} className="flex-1 lg:w-full lg:flex-none">
                             <NavLink
                                 to={item.path}
-                                // 4. Диспатчим переведенное название в заголовок страницы
-                                onClick={() => dispatch(setPageTitle(t(item.labelKey)))}
+                                // Передаем КЛЮЧ в Redux для динамического перевода в хедере
+                                onClick={() => dispatch(setPageTitle(item.labelKey))}
                                 className={({ isActive }) => `
-                                    flex font-bold items-center gap-3 px-5 py-6 rounded-lg transition-all duration-800
-                                    ${isActive ? 'bg-[#362F5E] text-white shadow-lg shadow-blue-900/20'
-                                    : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200 hover:transition-all duration-600'}
+                                    flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 
+                                    py-3 lg:px-5 lg:py-5 rounded-2xl transition-all duration-300
+                                    ${isActive
+                                    ? (isDark ? 'text-blue-400 lg:bg-[#362F5E] lg:text-white lg:shadow-lg lg:shadow-blue-900/20' : 'text-[#362F5E] lg:bg-[#362F5E] lg:text-white')
+                                    : (isDark ? 'text-slate-500 hover:text-slate-300 lg:hover:bg-white/5' : 'text-slate-400 hover:text-slate-600 lg:hover:bg-black/5')}
                                 `}
                             >
-                                <item.icon size={24} />
-                                {/* 5. Отображаем переведенный текст */}
-                                <span>{t(item.labelKey)}</span>
+                                <item.icon size={window.innerWidth < 1024 ? 22 : 24} />
+                                <span className="text-[10px] lg:text-sm font-black uppercase tracking-widest lg:tracking-normal lg:capitalize">
+                                    {t(item.labelKey)}
+                                </span>
+
+                                {/* Индикатор активной страницы для мобилок (точка снизу) */}
+                                <div className={`lg:hidden w-1 h-1 rounded-full mt-0.5 transition-all ${isDark ? 'bg-blue-400' : 'bg-[#362F5E]'} opacity-0`} />
                             </NavLink>
                         </li>
                     ))}
                 </ul>
             </div>
 
-            {/* Footer block */}
+            {/* Footer (Code by): Скрываем на мобилках, чтобы не занимать место */}
             <motion.div
                 whileHover={{ y: -5 }}
-                className={`relative mx-4 mt-auto mb-6 p-[1px] rounded-[32px] overflow-hidden transition-all duration-500
-                    ${isDark ? 'bg-gradient-to-br from-white/10 to-transparent shadow-2xl' : 'bg-gradient-to-br from-slate-200 to-white shadow-lg'}
+                className={`hidden lg:block relative mx-6 mt-auto mb-8 p-[1px] rounded-[32px] overflow-hidden transition-all duration-500
+                    ${isDark ? 'bg-gradient-to-br from-white/10 to-transparent' : 'bg-gradient-to-br from-slate-200 to-white'}
                 `}
             >
-                <div className={`relative z-10 flex flex-col items-center gap-6 p-6 rounded-[31px] backdrop-blur-xl transition-colors duration-500
+                <div className={`relative z-10 flex flex-col items-center gap-6 p-6 rounded-[31px] backdrop-blur-xl
                     ${isDark ? 'bg-[#161B26]/80' : 'bg-white/60'}
                 `}>
                     <div className="relative group">
-                        <div className={`absolute inset-0 rounded-full blur-2xl opacity-20 transition-opacity group-hover:opacity-40
-                            ${isDark ? 'bg-blue-500' : 'bg-[#362F5E]'}
-                        `} />
-                        <img src={codeBy} alt="code_icon" className="relative z-10 w-28 h-28 object-contain transition-transform duration-500 group-hover:scale-110" />
+                        <div className={`absolute inset-0 rounded-full blur-2xl opacity-20 ${isDark ? 'bg-blue-500' : 'bg-[#362F5E]'}`} />
+                        <img src={codeBy} alt="code_icon" className="relative z-10 w-24 h-24 object-contain" />
                     </div>
 
                     <div className="text-center space-y-1">
-                        <p className={`text-[10px] font-black uppercase tracking-[0.3em] opacity-50
-                            ${isDark ? 'text-slate-400' : 'text-slate-500'}
-                        `}>
-                            {/* 6. Переводим "Developed by" */}
-                            {t('navbar.developed_by')}
-                        </p>
-                        <p className={`text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-[#362F5E]'}`}>
-                            Vladyslav Kholod
-                        </p>
-                        <div className={`h-[2px] w-8 mx-auto rounded-full mt-2 ${isDark ? 'bg-blue-500/50' : 'bg-[#362F5E]/20'}`} />
+                        <p className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40">Developed by</p>
+                        <p className={`text-xs font-black tracking-tight ${isDark ? 'text-white' : 'text-[#362F5E]'}`}>Vladyslav Kholod</p>
                     </div>
-
-                    {isDark && (
-                        <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay"
-                             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
-                    )}
                 </div>
-
-                <p className={`absolute bottom-3 w-full text-center text-[9px] font-bold opacity-30 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {/* 7. Переводим "Rights Reserved" */}
-                    © 2026 {t('navbar.rights_reserved')}
-                </p>
             </motion.div>
         </nav>
-    )
-}
+    );
+};
 
 export default Navbar;

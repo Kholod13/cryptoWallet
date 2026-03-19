@@ -3,7 +3,6 @@ import {
     Search, Bell, Trophy, UserRoundIcon, CircleHelp, X, Info, ShieldCheck, Key, Lock, Wallet, PieChart
 } from 'lucide-react';
 import { Link } from "react-router-dom";
-//import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppSelector } from '../../store/';
 import { createPortal } from 'react-dom';
@@ -24,20 +23,20 @@ export const Header = () => {
 
     return (
         <header className={`
-            flex px-8 py-4 justify-between items-center sticky top-0 z-[100] transition-all duration-500 border-b
+            flex px-4 md:px-8 py-3 md:py-4 justify-between items-center sticky top-0 z-[100] transition-all duration-500 border-b
             ${isDark ? 'bg-[#12141C]/80 border-white/5' : 'bg-white/80 border-slate-200 shadow-sm'} 
             backdrop-blur-md
         `}>
-            {/* Title */}
-            <div className="w-1/4">
-                <h1 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-800'}`}>
+            {/* 1. Блок заголовка: на мобилках занимает меньше места */}
+            <div className="flex-shrink-0 lg:w-1/4">
+                <h1 className={`text-lg md:text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-800'}`}>
                     {t(pageTitleKey)}
                 </h1>
             </div>
 
-            {/* Search */}
+            {/* 2. Поиск: скрываем на мобилках (до 768px), оставляем на десктопе */}
             <div className={`
-                flex items-center px-4 py-2.5 gap-3 rounded-2xl w-1/3 transition-all duration-500 border
+                hidden md:flex items-center px-4 py-2 gap-3 rounded-2xl w-1/3 transition-all duration-500 border
                 ${isDark ? 'bg-white/5 border-white/10 text-white/75' : 'bg-slate-100 border-slate-200 focus-within:bg-white text-slate-900'}
             `}>
                 <Search size={18} className="text-slate-500" />
@@ -48,42 +47,49 @@ export const Header = () => {
                 />
             </div>
 
-            {/* Icons & Profile */}
-            <div className="flex items-center gap-6">
-                <div className="flex items-center gap-3">
-                    {[Bell, Trophy].map((Icon, idx) => (
-                        <button key={idx} className={`p-2.5 rounded-xl border transition-all duration-300 cursor-pointer
-                            ${isDark ? 'border-white/10 hover:bg-white/5 text-slate-400 hover:text-white' : 'border-slate-200 hover:bg-slate-50 text-slate-600'}
-                        `}>
-                            <Icon size={20} />
-                        </button>
-                    ))}
+            {/* 3. Правая часть: кнопки и профиль */}
+            <div className="flex items-center gap-2 md:gap-6">
+
+                {/* Кнопки уведомлений: на мобилках оставляем только Bell для экономии места */}
+                <div className="flex items-center gap-1 md:gap-3">
+                    <button className={`p-2 md:p-2.5 rounded-xl border transition-all cursor-pointer
+                        ${isDark ? 'border-white/10 text-slate-400 hover:text-white' : 'border-slate-200 text-slate-600'}`}>
+                        <Bell size={18} />
+                    </button>
+                    {/* Кнопка Трофея видна только с планшета */}
+                    <button className={`hidden sm:block p-2 md:p-2.5 rounded-xl border transition-all cursor-pointer
+                        ${isDark ? 'border-white/10 text-slate-400 hover:text-white' : 'border-slate-200 text-slate-600'}`}>
+                        <Trophy size={18} />
+                    </button>
                 </div>
 
-                <div className={`w-[1px] h-8 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                <div className={`hidden md:block w-[1px] h-8 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
 
-                <div className="flex items-center gap-5 h-full">
-                    {/* КНОПКА ПОМОЩИ */}
+                <div className="flex items-center gap-2 md:gap-5">
+                    {/* Кнопка помощи: чуть меньше на мобилках */}
                     <button
                         onClick={() => setIsHelpOpen(true)}
                         className="cursor-pointer hover:scale-110 transition-transform text-slate-500 hover:text-blue-500"
                     >
-                        <CircleHelp size={28} />
+                        <CircleHelp size={24} />
                     </button>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-4">
+                        {/* Имя и профессия: скрываем на мобилках до 1024px (lg) */}
                         <div className="hidden lg:block text-right">
                             <p className={`font-black text-sm leading-none mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{username}</p>
                             <p className="text-[10px] font-bold uppercase tracking-wider opacity-50">{profession}</p>
                         </div>
-                        <Link to="/settings" className="cursor-pointer group">
-                            <div className={`relative flex items-center justify-center w-12 h-12 rounded-2xl overflow-hidden border-2 transition-all duration-500
+
+                        {/* Аватарка: 10 h-10 на мобилках, 12 h-12 на десктопе */}
+                        <Link to="/settings" className="cursor-pointer">
+                            <div className={`relative flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden border-2 transition-all duration-500
                                 ${isDark ? 'bg-slate-800 border-white/10 group-hover:border-blue-500' : 'bg-slate-200 border-white shadow-sm group-hover:border-blue-500'}
                             `}>
                                 {tempAvatar ? (
                                     <img src={tempAvatar} alt="profile" className="w-full h-full object-cover" />
                                 ) : (
-                                    <UserRoundIcon size={24} className="text-slate-400" />
+                                    <UserRoundIcon size={20} className="text-slate-400" />
                                 )}
                             </div>
                         </Link>
