@@ -15,7 +15,7 @@ export const AnimatedBackgroundText = () => {
     };
 
     return (
-        <div className="absolute top-15 right-0 flex-col pointer-events-none select-none overflow-hidden z-0">
+        <div className="absolute top-[10%] left-0 w-full flex flex-col items-center pointer-events-none select-none z-0">
             {/* Декоративное свечение на фоне */}
             <div className="absolute top-1/5 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[100px] bg-blue-600/10 rounded-full blur-[120px]" />
             <div className="absolute top-1/5 right-1/4 w-[300px] h-[100px] bg-emerald-500/5 rounded-full blur-[100px]" />
@@ -24,7 +24,7 @@ export const AnimatedBackgroundText = () => {
                 variants={container}
                 initial="hidden"
                 animate="visible"
-                className="text-[4vw] font-black uppercase tracking-tighter leading-none flex flex-wrap justify-center px-10 text-center"
+                className="text-[12vw] md:text-[6vw] font-black uppercase tracking-tighter leading-none text-center px-4"
             >
                 {letters.map((letter, index) => (
                     <motion.span
@@ -67,7 +67,8 @@ export const AnimatedBackgroundText = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.4 }}
                 transition={{ delay: 2, duration: 1 }}
-                className="mt-4 text-right pr-8 text-slate-500 font-mono text-sm tracking-[0.5em] uppercase"
+                className="mt-4 text-center text-slate-600 font-mono text-[8px] md:text-xs tracking-[0.5em] uppercase"
+                style={{color: 'white'}}
             >
                 Decentralized & Secure
             </motion.p>

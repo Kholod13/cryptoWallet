@@ -28,7 +28,7 @@ export const BitcoinFlow = () => {
         return () => clearInterval(interval);
     }, []);
     return (
-        <div className="absolute bottom-0 w-full h-1/4  overflow-hidden  flex items-center justify-center shadow-2xl">
+        <div className="absolute bottom-0 w-full h-[150px] md:h-1/4 overflow-hidden flex items-center justify-center">
 
             {/* ЦЕНТРАЛЬНАЯ АНИМАЦИЯ ПОТОКА */}
             <div className="relative w-full h-full flex items-center justify-center">
@@ -63,7 +63,7 @@ export const BitcoinFlow = () => {
             </div>
 
             {/* НИЖНЯЯ ИНФО-ПАНЕЛЬ */}
-            <div className="absolute bottom-6 right-6 px-6 py-2 bg-white/5 rounded-full border border-white/5 backdrop-blur-sm flex gap-4">
+            <div className="absolute bottom-6 right-6 px-6 py-2 bg-white/5 rounded-full border border-white/5 backdrop-blur-sm flex gap-4" style={{color: 'white'}}>
                 <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-ping" />
                     <span className="text-[10px] text-slate-400 font-bold uppercase">Network Live</span>

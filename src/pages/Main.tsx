@@ -16,32 +16,35 @@ const Main = () => {
     }, [dispatch]);
 
     return (
-        <div className={`
-            /* На мобилках - колонка, на десктопе - ряд */
-            flex flex-col lg:flex-row 
-            min-h-screen transition-colors duration-700 
-            ${isDark ? 'dark bg-[#12141C]' : 'light bg-[#F1F5F9]'}
-        `}>
+        <div className={`flex flex-col lg:flex-row min-h-screen transition-colors duration-700 ${isDark ? 'dark bg-[#12141C]' : 'light bg-[#F1F5F9]'}`}>
 
-            {/* Navbar сам адаптируется (мы обновим его код следующим шагом) */}
             <Navbar />
 
             <div className="flex flex-col flex-1 min-w-0">
                 <Header />
 
-                {/*
-                   На мобилках уменьшаем паддинги (px-4),
-                   на планшетах (md:px-10),
-                   добавляем отступ снизу (pb-24), чтобы контент не перекрывался нижним меню
-                */}
                 <main className={`
-                    flex flex-col flex-1 
-                    p-4 md:p-8 lg:p-10 
-                    pb-24 lg:pb-10 
-                    transition-colors duration-700
-                    ${isDark ? 'bg-[#181B24]/50' : 'bg-white/20'} 
-                `}>
-                    <Outlet />
+            /* Базовые настройки */
+            flex flex-col flex-1
+            transition-all duration-700
+            
+            /* Отступы: на мобилке даемpb-32 (128px), на десктопе убираем его */
+            p-4 md:p-8 lg:p-10
+            pb-4 lg:pb-8
+            
+            /* Цвета темы */
+            ${isDark ? 'bg-[#181B24]/50' : 'bg-white/20'} 
+        `}>
+                    <div className="flex-1"> {/* Дополнительная обертка для стабильности */}
+                        <Outlet />
+                    </div>
+
+                    {/*
+               ХАК ДЛЯ МОБИЛОК:
+               Если pb-32 не помогает, мы добавляем невидимый блок
+               высотой с Navbar в самый низ main
+            */}
+                    <div className="h-20 lg:hidden" aria-hidden="true" />
                 </main>
             </div>
         </div>

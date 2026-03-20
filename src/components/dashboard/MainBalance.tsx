@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { Wallet, TrendingUp, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fetchSourceBalances, syncExchangeBalances } from "../../store/slices/walletSlice.ts";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 const currencySymbols: Record<string, string> = {
     USD: '$', EUR: '€', CZK: 'Kč', UAH: '₴'
@@ -11,8 +12,6 @@ const currencySymbols: Record<string, string> = {
 
 export const MainBalance = () => {
     const dispatch = useAppDispatch();
-
-    // Достаем тему, курсы и данные пользователя
     const { coins, fiatRates } = useAppSelector((state) => state.market);
     const { theme } = useAppSelector((state) => state.ui);
     const { user } = useAppSelector((state) => state.auth);
@@ -40,7 +39,6 @@ export const MainBalance = () => {
             }, 0);
             return total + walletSum;
         }, 0);
-
         return totalUSD * rate;
     }, [connectedWallets, coins, rate]);
 
@@ -63,24 +61,30 @@ export const MainBalance = () => {
     }, [connectedWallets.length, dispatch]);
 
     return (
-        /* 1. ВНЕШНЯЯ ГРАДИЕНТНАЯ РАМКА (p-[1px]) */
         <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`relative p-[1px] rounded-[40px] transition-all duration-500 h-fit shadow-2xl overflow-hidden min-w-[480px] `}
+            /*
+               ИСПРАВЛЕНИЕ АДАПТИВА:
+               w-full - на мобилках во всю ширину
+               md:min-w-[440px] - на планшетах и десктопах фиксируем минимум
+               flex-shrink-0 - ЗАПРЕЩАЕМ соседям сдавливать этот блок
+            */
+            className={`relative p-[1px] rounded-[40px] transition-all duration-500 shadow-2xl overflow-hidden 
+                w-full md:min-w-[440px] md:max-w-[480px] shrink-0 h-[230px]
+                ${isDark ? 'bg-gradient-to-br from-white/10 to-transparent' : 'bg-gradient-to-br from-slate-200 to-white'}
+            `}
         >
-            {/* 2. ГЛАВНЫЙ КОНТЕЙНЕР (Стекло) */}
-            <div className={`relative z-10 p-8 rounded-[39px] backdrop-blur-[20px] h-auto flex flex-col justify-between transition-colors duration-500
+            <div className={`relative z-10 p-6 md:p-8 rounded-[39px] backdrop-blur-[20px] h-full flex flex-col justify-between transition-colors duration-500
                 ${isDark ? 'bg-[#362F5E]/90' : 'bg-white/80'}
             `}>
 
-                {/* ДЕКОРАТИВНЫЕ СВЕТОВЫЕ ПЯТНА */}
                 <div className={`absolute -right-10 -top-10 w-40 h-40 rounded-full blur-3xl opacity-20
                     ${isDark ? 'bg-white' : 'bg-blue-400'}
                 `} />
 
                 <div className="relative z-20">
-                    <div className="flex justify-between items-center mb-6">
+                    <div className="flex justify-between items-center mb-4 md:mb-6">
                         <div className="flex items-center gap-2.5">
                             <div className={`p-2 rounded-xl ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-[#362F5E]'}`}>
                                 <Wallet size={18} />
@@ -99,17 +103,17 @@ export const MainBalance = () => {
                         </button>
                     </div>
 
-                    <div className="flex items-baseline gap-4 mt-2">
+                    <div className="flex items-baseline gap-3 md:gap-4 mt-2">
                         <div className="relative">
-                            {/* Ghost (Призрак для ширины) */}
-                            <h2 className="text-5xl font-black tracking-tighter invisible whitespace-nowrap tabular-nums">
+                            {/* Ghost (Ширина подстраивается под текст) */}
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter invisible whitespace-nowrap tabular-nums">
                                 {mainCurrency === 'CZK' || mainCurrency === 'UAH'
                                     ? `${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })} ${currencySymbols[mainCurrency]}`
                                     : `${currencySymbols[mainCurrency]}${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                             </h2>
 
-                            {/* Реальный текст */}
-                            <h2 className={`text-5xl font-black tracking-tighter absolute top-0 left-0 whitespace-nowrap tabular-nums transition-colors
+                            {/* Real Text */}
+                            <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter absolute top-0 left-0 whitespace-nowrap tabular-nums transition-colors
                                 ${isDark ? 'text-white' : 'text-[#362F5E]'}
                             `}>
                                 {isVisible
@@ -120,16 +124,15 @@ export const MainBalance = () => {
                             </h2>
                         </div>
 
-                        <span className={`text-xl font-bold transition-colors ${isDark ? 'text-emerald-400' : 'text-emerald-600'} opacity-60`}>
+                        <span className={`text-lg md:text-xl font-bold transition-colors ${isDark ? 'text-emerald-400' : 'text-emerald-600'} opacity-60`}>
                             {mainCurrency}
                         </span>
                     </div>
                 </div>
 
-                {/* НИЖНИЙ БЕДЖ */}
-                <div className="relative z-20 flex items-center gap-2 w-fit px-4 py-2 rounded-2xl transition-colors mt-5
-                    ${isDark ? 'bg-white/10 border border-white/5' : 'bg-slate-100/80 border border-slate-200'}
-                ">
+                <div className={`relative z-20 flex items-center gap-2 w-fit px-4 py-2 rounded-2xl border transition-colors
+                    ${isDark ? 'bg-white/10 border-white/5' : 'bg-slate-100/80 border-slate-200'}
+                `}>
                     <div className={`rounded-full p-1 ${isDark ? 'bg-emerald-500' : 'bg-emerald-600'}`}>
                         <TrendingUp size={10} className={isDark ? 'text-slate-900' : 'text-white'} />
                     </div>
@@ -139,7 +142,6 @@ export const MainBalance = () => {
                 </div>
             </div>
 
-            {/* ТЕКСТУРА ШУМА */}
             {isDark && (
                 <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay"
                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />

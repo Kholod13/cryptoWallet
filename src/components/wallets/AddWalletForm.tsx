@@ -200,7 +200,8 @@ export const AddWalletForm = () => {
 
             {/* ПОРТАЛ (Исправлено - портал обернут в AnimatePresence условие) */}
             {isHelpOpen && createPortal(
-                <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 sm:p-6">
+                    {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -208,68 +209,76 @@ export const AddWalletForm = () => {
                         className="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-pointer"
                     />
 
+                    {/* Modal Content */}
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         onClick={(e) => e.stopPropagation()}
-                        className={`relative w-full max-w-xl rounded-[40px] p-10 shadow-2xl border overflow-hidden
-                            ${isDark ? 'bg-[#161B26] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'}
-                        `}
+                        className={`relative w-full max-w-xl rounded-[32px] md:rounded-[40px] p-6 md:p-10 shadow-2xl border overflow-hidden
+                ${isDark ? 'bg-[#161B26] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'}
+            `}
                     >
-                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-                        <div className="flex justify-between items-center mb-8 relative z-10 text-left">
+                        {/* Декоративное свечение — уменьшено для мобилок */}
+                        <div className="absolute -top-16 -right-16 md:-top-24 md:-right-24 w-32 h-32 md:w-48 md:h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                        <div className="flex justify-between items-center mb-6 md:mb-8 relative z-10 text-left">
                             <div>
-                                <h3 className="text-2xl font-black tracking-tight flex items-center gap-3 text-left">
-                                    <Info className="text-blue-500" size={28} />
+                                <h3 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2 md:gap-3 text-left italic">
+                                    <Info className="text-blue-500" size={24} />
                                     {t('wallets.add_wallet.guide.title')}
                                 </h3>
-                                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">
+                                <p className="text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-1">
                                     {t('wallets.add_wallet.guide.undertitle')}
                                 </p>
                             </div>
-                            <button onClick={() => setIsHelpOpen(false)} className="p-2 hover:bg-white/5 rounded-full cursor-pointer">
-                                <X size={24} className="text-slate-400" />
+                            <button onClick={() => setIsHelpOpen(false)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors cursor-pointer">
+                                <X size={20} className="text-slate-400" />
                             </button>
                         </div>
 
-                        <div className="space-y-8 overflow-y-auto max-h-[60vh] pr-4 custom-scrollbar relative z-10 text-left">
-                            <div className="flex gap-5">
-                                <div className={`p-3.5 h-fit rounded-2xl bg-blue-500/10 text-blue-500 border ${isDark ? 'border-blue-500/20' : 'border-blue-500/10'}`}>
-                                    <Wallet size={24}/>
+                        {/* Скролл-зона: max-h ограничена, чтобы кнопка снизу всегда была видна */}
+                        <div className="space-y-6 md:space-y-8 overflow-y-auto max-h-[50vh] md:max-h-[60vh] pr-2 md:pr-4 custom-scrollbar relative z-10 text-left">
+
+                            {/* Section 1: Web3 */}
+                            <div className="flex gap-4 md:gap-5">
+                                <div className={`p-2.5 md:p-3.5 h-fit rounded-xl md:rounded-2xl bg-blue-500/10 text-blue-500 border ${isDark ? 'border-blue-500/20' : 'border-blue-500/10'}`}>
+                                    <Wallet className="w-5 h-5 md:w-6 md:h-6"/>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-lg">{t('wallets.add_wallet.guide.web3.title')}</h4>
-                                    <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                    <h4 className="font-bold text-base md:text-lg">{t('wallets.add_wallet.guide.web3.title')}</h4>
+                                    <p className={`text-xs md:text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                                         {t('wallets.add_wallet.guide.web3.description')}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="flex gap-5">
-                                <div className={`p-3.5 h-fit rounded-2xl bg-emerald-500/10 text-emerald-500 border ${isDark ? 'border-emerald-500/20' : 'border-emerald-500/10'}`}>
-                                    <Key size={24}/>
+                            {/* Section 2: CEX */}
+                            <div className="flex gap-4 md:gap-5">
+                                <div className={`p-2.5 md:p-3.5 h-fit rounded-xl md:rounded-2xl bg-emerald-500/10 text-emerald-500 border ${isDark ? 'border-emerald-500/20' : 'border-emerald-500/10'}`}>
+                                    <Key className="w-5 h-5 md:w-6 md:h-6"/>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-lg">{t('wallets.add_wallet.guide.exchanges.title')}</h4>
-                                    <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                    <h4 className="font-bold text-base md:text-lg">{t('wallets.add_wallet.guide.exchanges.title')}</h4>
+                                    <p className={`text-xs md:text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                                         {t('wallets.add_wallet.guide.exchanges.description')}
                                     </p>
-                                    <div className="mt-3 p-3 bg-amber-500/5 rounded-xl border border-amber-500/10 flex items-start gap-3">
-                                        <ShieldCheck size={18} className="text-amber-500 shrink-0 mt-0.5" />
-                                        <p className="text-[11px] text-amber-600 italic font-medium leading-tight">
+                                    <div className="mt-3 p-2.5 md:p-3 bg-amber-500/5 rounded-xl border border-amber-500/10 flex items-start gap-2 md:gap-3">
+                                        <ShieldCheck size={16} className="text-amber-500 shrink-0 mt-0.5" />
+                                        <p className="text-[10px] md:text-[11px] text-amber-600 italic font-medium leading-tight">
                                             {t('wallets.add_wallet.guide.exchanges.enable')}
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex gap-5">
-                                <div className={`p-3.5 h-fit rounded-2xl bg-amber-500/10 text-amber-400 border ${isDark ? 'border-amber-500/20' : 'border-amber-500/10'}`}>
-                                    <Lock size={24}/>
+                            {/* Section 3: OKX */}
+                            <div className="flex gap-4 md:gap-5">
+                                <div className={`p-2.5 md:p-3.5 h-fit rounded-xl md:rounded-2xl bg-amber-500/10 text-amber-400 border ${isDark ? 'border-amber-500/20' : 'border-amber-500/10'}`}>
+                                    <Lock className="w-5 h-5 md:w-6 md:h-6"/>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-lg">{t('wallets.add_wallet.guide.okx.title')}</h4>
-                                    <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                    <h4 className="font-bold text-base md:text-lg">{t('wallets.add_wallet.guide.okx.title')}</h4>
+                                    <p className={`text-xs md:text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                                         {t('wallets.add_wallet.guide.okx.description')}
                                     </p>
                                 </div>
@@ -278,9 +287,9 @@ export const AddWalletForm = () => {
 
                         <button
                             onClick={() => setIsHelpOpen(false)}
-                            className={`w-full mt-10 text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-lg transition-all active:scale-95 cursor-pointer
-                                ${isDark ? 'bg-blue-600' : 'bg-[#362F5E]'}
-                            `}
+                            className={`w-full mt-6 md:mt-10 text-white font-black uppercase tracking-widest py-3.5 md:py-4 rounded-xl md:rounded-2xl shadow-lg transition-all active:scale-95 cursor-pointer text-sm md:text-base
+                    ${isDark ? 'bg-blue-600 hover:bg-blue-500' : 'bg-[#362F5E] hover:opacity-90'}
+                `}
                         >
                             {t('wallets.add_wallet.guide.button')}
                         </button>

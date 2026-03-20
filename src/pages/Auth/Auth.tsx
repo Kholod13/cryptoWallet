@@ -13,48 +13,29 @@ import Logo from '../../components/ui/Logo';
 const AuthPage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    // 2. Достаем токен из стора
     const { isLoading, error, token } = useAppSelector((state) => state.auth);
 
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({ username: '', email: '', password: '' });
     const [localError, setLocalError] = useState('');
 
-    // 3. СЛЕДИМ ЗА ТОКЕНОМ: Если он появился — уходим на Dashboard
     useEffect(() => {
-        if (token) {
-            navigate('/');
-        }
+        if (token) navigate('/');
     }, [token, navigate]);
 
     useEffect(() => {
         dispatch(clearError());
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocalError('');
     }, [isLogin, dispatch]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // e.target.name — это имя инпута (например, "email")
-        // e.target.value — это то, что ты ввел в этот инпут
-        setFormData({
-            ...formData,               // Копируем все старые поля
-            [e.target.name]: e.target.value  // Обновляем только то поле, которое изменилось
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Отправка формы...", formData); // ЛОГ ДЛЯ ПРОВЕРКИ
-
-        setLocalError('');
-        if (!formData.email.includes('@')) {
-            setLocalError('Invalid email address');
-            return;
-        }
-        if (formData.password.length < 6) {
-            setLocalError('Password must be at least 6 characters');
-            return;
-        }
+        if (!formData.email.includes('@')) return setLocalError('Invalid email address');
+        if (formData.password.length < 6) return setLocalError('Min 6 characters');
 
         if (isLogin) {
             dispatch(loginUser({ email: formData.email, password: formData.password }));
@@ -64,101 +45,83 @@ const AuthPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0B101B] p-4 relative">
-            <DataAggregation />
-            <BitcoinFlow />
-            <AnimatedBackgroundText/>
+        <div className="min-h-screen w-full flex items-center justify-center bg-[#0B101B] p-4 relative overflow-hidden">
+
+            {/* СЛОЙ ДЕКОРАЦИЙ (Адаптивный) */}
+            <div className="absolute inset-0 z-0">
+                <div className="hidden lg:block">
+                    <DataAggregation />
+                </div>
+                <div className="opacity-30 md:opacity-100">
+                    <AnimatedBackgroundText />
+                </div>
+                <div className="opacity-50">
+                    <BitcoinFlow />
+                </div>
+            </div>
+
+            {/* ФОРМА (Всегда в центре и выше всех) */}
             <motion.div
                 layout
-                className="bg-[#161B26] w-full max-w-md p-8 rounded-[32px] shadow-2xl border border-white/5 absolute z-100"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative z-50 bg-[#161B26]/80 backdrop-blur-xl w-full max-w-[400px] p-6 md:p-10 rounded-[40px] shadow-2xl border border-white/5"
             >
-                <div className="flex items-center justify-center mb-3">
-                    <Logo/>
+                <div className="flex items-center justify-center mb-6">
+                    <Logo className="w-16 h-16" />
                 </div>
-                <p className="text-3xl font-black text-white mb-2 text-center" style={{ color: 'white' }}>
+
+                <h2 className="text-2xl md:text-3xl font-black text-white mb-2 text-center tracking-tight" style={{color: 'white'}}>
                     {isLogin ? 'Welcome Back' : 'Create Account'}
-                </p>
-                <p className="text-slate-400 text-center mb-8 text-sm" style={{ color: 'white' }}>
-                    {isLogin ? 'Log in to manage your crypto' : 'Join us and start tracking your assets'}
+                </h2>
+                <p className="text-slate-400 text-center mb-8 text-sm md:text-base" style={{color: 'white'}}>
+                    {isLogin ? 'Log in to manage assets' : 'Join the crypto tracker'}
                 </p>
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-8">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-5">
                     <AnimatePresence mode="wait">
                         {!isLogin && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="relative"
-                            >
-                                <User className="absolute left-4 top-3.5 text-slate-500" size={18} />
-                                <input
-                                    name="username"
-                                    type="text"
-                                    placeholder="Username"
-                                    value={formData.username}
-                                    onChange={handleChange}
-                                    className="w-full bg-black/20 border border-white/10 p-3 pl-12 rounded-xl text-white focus:border-[#362F5E] outline-none transition-all"
-                                />
+                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="relative overflow-hidden">
+                                <User className="absolute left-4 top-4 text-slate-500" size={18} />
+                                <input name="username" type="text" placeholder="Username" value={formData.username} onChange={handleChange}
+                                       className="w-full bg-black/30 border border-white/10 p-3.5 pl-12 rounded-2xl text-white outline-none focus:border-blue-500 transition-all" />
                             </motion.div>
                         )}
                     </AnimatePresence>
 
                     <div className="relative">
-                        <Mail className="absolute left-4 top-3.5 text-slate-500" size={18} />
-                        <input
-                            name="email"
-                            type="email"
-                            placeholder="Email address"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className={`w-full bg-black/20 border p-3 pl-12 rounded-xl text-white outline-none transition-all 
-                                ${error || localError ? 'border-red-500/50' : 'border-white/10 focus:border-[#362F5E]'}`}
-                        />
+                        <Mail className="absolute left-4 top-4 text-slate-500" size={18} />
+                        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange}
+                               className={`w-full bg-black/30 border p-3.5 pl-12 rounded-2xl text-white outline-none transition-all 
+                                ${error || localError ? 'border-red-500/50' : 'border-white/10 focus:border-blue-500'}`} />
                     </div>
 
                     <div className="relative">
-                        <Lock className="absolute left-4 top-3.5 text-slate-500" size={18} />
-                        <input
-                            name="password"
-                            type="password"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className={`w-full bg-black/20 border p-3 pl-12 rounded-xl text-white outline-none transition-all 
-                                ${error || localError ? 'border-red-500/50' : 'border-white/10 focus:border-[#362F5E]'}`}
-                        />
+                        <Lock className="absolute left-4 top-4 text-slate-500" size={18} />
+                        <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange}
+                               className={`w-full bg-black/30 border p-3.5 pl-12 rounded-2xl text-white outline-none transition-all 
+                                ${error || localError ? 'border-red-500/50' : 'border-white/10 focus:border-blue-500'}`} />
                     </div>
 
-                    {/* ОТОБРАЖЕНИЕ ОШИБОК */}
                     {(error || localError) && (
-                        <motion.div
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl flex items-center gap-3 text-red-400 text-xs"
-                        >
+                        <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl flex items-center gap-3 text-red-400 text-xs">
                             <AlertCircle size={16} />
                             <span>{error || localError}</span>
-                        </motion.div>
+                        </div>
                     )}
 
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="bg-[#362F5E] hover:bg-[#4a4080] text-white font-bold py-4 rounded-xl mt-2 transition-all active:scale-95 disabled:opacity-50"
+                    <button type="submit" disabled={isLoading}
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-4 rounded-2xl mt-4 transition-all active:scale-95 disabled:opacity-50"
                     >
-                        {isLoading ? 'Processing...' : (isLogin ? 'Sign In' : 'Get Started')}
+                        {isLoading ? 'Wait...' : (isLogin ? 'Sign In' : 'Register')}
                     </button>
                 </form>
 
                 <div className="mt-8 text-center text-sm">
-                    <span className="text-slate-500" style={{ color: 'white' }}>
+                    <span className="text-slate-500" style={{color: 'white'}}>
                         {isLogin ? "Don't have an account? " : "Already have an account? "}
                     </span>
-                    <button
-                        onClick={() => setIsLogin(!isLogin)}
-                        className="text-blue-400 font-bold hover:underline"
-                    >
+                    <button onClick={() => setIsLogin(!isLogin)} className="text-blue-400 font-bold hover:underline">
                         {isLogin ? 'Sign Up' : 'Log In'}
                     </button>
                 </div>

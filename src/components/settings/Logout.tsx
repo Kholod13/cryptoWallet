@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../store";
 import { logout } from '../../store/slices/authSlice';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { motion } from 'framer-motion';
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 export const Logout = () => {
     const dispatch = useAppDispatch();
@@ -12,7 +12,6 @@ export const Logout = () => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
     const isDark = theme === 'dark';
-
     const { t } = useTranslation();
 
     const handleLogout = () => {
@@ -25,40 +24,45 @@ export const Logout = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setIsConfirmOpen(true)}
-                // ГРАДИЕНТНАЯ РАМКА (p-[1px])
-                className={`relative inline-block text-center rounded-[32px] cursor-pointer overflow-hidden p-[1px] transition-all duration-500 shadow-xl group
+                /*
+                   АДАПТАЦИЯ:
+                   w-full на мобилках, w-max на десктопе.
+                   Уменьшили скругление до 24px на маленьких экранах.
+                */
+                className={`relative inline-block text-center rounded-[24px] md:rounded-[32px] cursor-pointer overflow-hidden p-[1px] transition-all duration-500 shadow-xl group w-full sm:w-max
                     ${isDark
                     ? 'bg-gradient-to-br from-white/10 to-transparent shadow-purple-900/10'
                     : 'bg-gradient-to-br from-slate-200 to-slate-300 shadow-slate-200'}
                 `}
             >
                 {/* ВНУТРЕННИЙ КОНТЕЙНЕР (Стекло) */}
-                <div className={`flex h-full flex-col items-center justify-center p-9 rounded-[31px] backdrop-blur-xl transition-colors duration-500
+                <div className={`flex h-full flex-col items-center justify-center 
+                    p-6 md:p-9 rounded-[23px] md:rounded-[31px] backdrop-blur-xl transition-colors duration-500
                     ${isDark
                     ? 'bg-[#362F5E]/80 group-hover:bg-[#433a73]'
                     : 'bg-white/80 group-hover:bg-white'}
                 `}>
 
-                    <div className={`mb-4 p-4 rounded-2xl transition-all duration-500
+                    {/* ИКОНКА: 48 на мобилках, 64 на десктопе */}
+                    <div className={`mb-3 md:mb-4 p-3 md:p-4 rounded-xl transition-all duration-500
                         ${isDark ? 'bg-white/5 text-white' : 'bg-[#362F5E]/5 text-[#362F5E]'}
                     `}>
-                        <SquareArrowOutUpRight size={64} strokeWidth={2.5} />
+                        <SquareArrowOutUpRight className="w-10 h-10 md:w-16 md:h-16" strokeWidth={2.5} />
                     </div>
 
-                    <p className={`text-xl font-black uppercase tracking-widest transition-colors duration-500
+                    {/* ТЕКСТ: text-lg на мобилках, text-xl на десктопе */}
+                    <p className={`text-lg md:text-xl font-black uppercase tracking-widest transition-colors duration-500
                         ${isDark ? 'text-white' : 'text-[#362F5E]'}
                     `}>
                         {t('logout')}
                     </p>
 
-                    {/* Декоративный блик для темной темы */}
                     {isDark && (
-                        <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all" />
+                        <div className="absolute -bottom-4 -right-4 w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all" />
                     )}
                 </div>
             </motion.div>
 
-            {/* ВЫЗОВ УНИВЕРСАЛЬНОЙ МОДАЛКИ */}
             <ConfirmModal
                 isOpen={isConfirmOpen}
                 onClose={() => setIsConfirmOpen(false)}

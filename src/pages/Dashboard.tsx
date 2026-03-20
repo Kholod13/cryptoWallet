@@ -16,9 +16,9 @@ const Dashboard = () => {
 
     return (
         <div className="flex flex-col justify-between gap-5">
-            <div className="flex gap-5 justify-between">
+            <div className="flex flex-row max-[1250px]:flex-col gap-5 justify-between w-full">
                 <MainBalance />
-                <PnLAnalytics/>
+                <PnLAnalytics />
             </div>
             <AggregatedAssets />
             <CoinMarket />

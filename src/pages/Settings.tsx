@@ -14,9 +14,9 @@ const Settings = () => {
     return (
         <div className='flex flex-col gap-8'>
             <UserParams key={username} />
-            <div className='flex gap-6'>
+            <div className="flex flex-wrap gap-4 items-start justify-center md:justify-start">
                 <Contact />
-                <AppProperties/>
+                <AppProperties />
                 <Logout />
             </div>
         </div>

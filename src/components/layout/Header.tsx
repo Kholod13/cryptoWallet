@@ -101,7 +101,7 @@ export const Header = () => {
             {createPortal(
                 <AnimatePresence>
                     {isHelpOpen && (
-                        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6">
                             {/* Backdrop */}
                             <motion.div
                                 initial={{ opacity: 0 }}
@@ -117,80 +117,89 @@ export const Header = () => {
                                 animate={{ scale: 1, opacity: 1, y: 0 }}
                                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className={`relative w-full max-w-xl rounded-[40px] p-10 shadow-2xl border overflow-hidden
-                                    ${isDark ? 'bg-[#161B26] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'}
-                                `}
+                                // Адаптивные отступы p-6 для мобилок, p-10 для десктопа
+                                // Адаптивное закругление rounded-3xl для мобилок
+                                className={`relative w-full max-w-xl rounded-[32px] md:rounded-[40px] p-6 md:p-10 shadow-2xl border overflow-hidden
+                    ${isDark ? 'bg-[#161B26] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'}
+                `}
                             >
-                                <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+                                {/* Декоративное свечение — уменьшено для мобилок */}
+                                <div className="absolute -top-24 -right-24 w-32 h-32 md:w-48 md:h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                                <div className="flex justify-between items-center mb-8 relative z-10">
+                                <div className="flex justify-between items-center mb-6 md:mb-8 relative z-10">
                                     <div>
-                                        <h3 className="text-2xl font-black tracking-tight flex items-center gap-3">
-                                            <Info className="text-blue-500" size={28} />
+                                        <h3 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2 md:gap-3">
+                                            <Info className="text-blue-500" size={24} />
                                             {t('connection_guide.title')}
                                         </h3>
-                                        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">{t('connection_guide.undertitle')}</p>
+                                        <p className="text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-1">
+                                            {t('connection_guide.undertitle')}
+                                        </p>
                                     </div>
-                                    <button onClick={() => setIsHelpOpen(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors cursor-pointer">
-                                        <X size={24} className="text-slate-400" />
+                                    <button
+                                        onClick={() => setIsHelpOpen(false)}
+                                        className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors cursor-pointer"
+                                    >
+                                        <X size={20} className="text-slate-400" />
                                     </button>
                                 </div>
 
-                                <div className="space-y-8 overflow-y-auto max-h-[60vh] pr-4 custom-scrollbar relative z-10 text-left">
+                                {/* Скролл-зона: max-h ограничена для маленьких экранов */}
+                                <div className="space-y-6 md:space-y-8 overflow-y-auto max-h-[50vh] md:max-h-[60vh] pr-2 md:pr-4 custom-scrollbar relative z-10 text-left">
 
-                                    {/* Web3 Section */}
-                                    <div className="flex gap-5">
-                                        <div className={`p-3.5 h-fit rounded-2xl bg-blue-500/10 text-blue-500 border ${isDark ? 'border-blue-500/20' : 'border-blue-500/10'}`}>
-                                            <Wallet size={24}/>
+                                    {/* Section 1: Web3 */}
+                                    <div className="flex gap-4 md:gap-5">
+                                        <div className={`p-2.5 md:p-3.5 h-fit rounded-xl md:rounded-2xl bg-blue-500/10 text-blue-500 border ${isDark ? 'border-blue-500/20' : 'border-blue-500/10'}`}>
+                                            <Wallet size={20} className="md:w-6 md:h-6"/>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-lg">{t('connection_guide.web3.title')}</h4>
-                                            <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                            <h4 className="font-bold text-base md:text-lg">{t('connection_guide.web3.title')}</h4>
+                                            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-1">
                                                 {t('connection_guide.web3.description')}
                                             </p>
                                         </div>
                                     </div>
 
-                                    {/* CEX Section */}
-                                    <div className="flex gap-5">
-                                        <div className={`p-3.5 h-fit rounded-2xl bg-emerald-500/10 text-emerald-500 border ${isDark ? 'border-emerald-500/20' : 'border-emerald-500/10'}`}>
-                                            <Key size={24}/>
+                                    {/* Section 2: CEX */}
+                                    <div className="flex gap-4 md:gap-5">
+                                        <div className={`p-2.5 md:p-3.5 h-fit rounded-xl md:rounded-2xl bg-emerald-500/10 text-emerald-500 border ${isDark ? 'border-emerald-500/20' : 'border-emerald-500/10'}`}>
+                                            <Key size={20} className="md:w-6 md:h-6"/>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-lg">{t('connection_guide.exchanges.title')}</h4>
-                                            <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                            <h4 className="font-bold text-base md:text-lg">{t('connection_guide.exchanges.title')}</h4>
+                                            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-1">
                                                 {t('connection_guide.exchanges.description')}
                                             </p>
-                                            <div className="mt-3 p-3 bg-amber-500/5 rounded-xl border border-amber-500/10 flex items-start gap-3">
-                                                <ShieldCheck size={18} className="text-amber-500 shrink-0 mt-0.5" />
-                                                <p className="text-[11px] text-amber-600 italic font-medium leading-tight">
+                                            <div className="mt-2 p-2.5 bg-amber-500/5 rounded-xl border border-amber-500/10 flex items-start gap-2">
+                                                <ShieldCheck size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                                                <p className="text-[10px] md:text-[11px] text-amber-600 italic font-medium leading-tight">
                                                     {t('connection_guide.exchanges.critical')}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* OKX Specifics */}
-                                    <div className="flex gap-5">
-                                        <div className={`p-3.5 h-fit rounded-2xl bg-amber-500/10 text-amber-500 border ${isDark ? 'border-amber-500/20' : 'border-amber-500/10'}`}>
-                                            <Lock size={24}/>
+                                    {/* Section 3: OKX */}
+                                    <div className="flex gap-4 md:gap-5">
+                                        <div className={`p-2.5 md:p-3.5 h-fit rounded-xl md:rounded-2xl bg-amber-500/10 text-amber-400 border ${isDark ? 'border-amber-500/20' : 'border-amber-500/10'}`}>
+                                            <Lock size={20} className="md:w-6 md:h-6"/>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-lg">{t('connection_guide.okx.title')}</h4>
-                                            <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                            <h4 className="font-bold text-base md:text-lg">{t('connection_guide.okx.title')}</h4>
+                                            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-1">
                                                 {t('connection_guide.okx.description')}
                                             </p>
                                         </div>
                                     </div>
 
-                                    {/* Analytics */}
-                                    <div className="flex gap-5">
-                                        <div className={`p-3.5 h-fit rounded-2xl bg-purple-500/10 text-purple-500 border ${isDark ? 'border-purple-500/20' : 'border-purple-500/10'}`}>
-                                            <PieChart size={24}/>
+                                    {/* Section 4: Analytics */}
+                                    <div className="flex gap-4 md:gap-5">
+                                        <div className={`p-2.5 md:p-3.5 h-fit rounded-xl md:rounded-2xl bg-purple-500/10 text-purple-500 border ${isDark ? 'border-purple-500/20' : 'border-purple-500/10'}`}>
+                                            <PieChart size={20} className="md:w-6 md:h-6"/>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-lg">{t('connection_guide.analytics.title')}</h4>
-                                            <p className={`text-sm leading-relaxed mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                            <h4 className="font-bold text-base md:text-lg">{t('connection_guide.analytics.title')}</h4>
+                                            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-1">
                                                 {t('connection_guide.analytics.description')}
                                             </p>
                                         </div>
@@ -199,7 +208,7 @@ export const Header = () => {
 
                                 <button
                                     onClick={() => setIsHelpOpen(false)}
-                                    className="w-full mt-10 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/30 cursor-pointer"
+                                    className="w-full mt-6 md:mt-10 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-3 md:py-4 rounded-xl md:rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/30 cursor-pointer text-sm md:text-base"
                                 >
                                     {t('connection_guide.button')}
                                 </button>

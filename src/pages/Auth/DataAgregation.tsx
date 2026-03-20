@@ -14,7 +14,7 @@ export const DataAggregation = () => {
     const radius = 120; // Радиус круга в пикселях
 
     return (
-        <div className="absolute top-40 left-20 flex items-center justify-center w-[400px] h-[400px] mx-auto">
+        <div className="absolute top-[20%] left-[10%] scale-50 md:scale-75 lg:scale-100 flex items-center justify-center w-[400px] h-[400px]">
 
             {/* 1. ЦЕНТРАЛЬНАЯ ИКОНКА (Символ объединения) */}
             <div className="relative z-20 bg-[#362F5E] p-6 rounded-full shadow-[0_0_50px_rgba(54,47,94,0.5)] border border-white/20">
