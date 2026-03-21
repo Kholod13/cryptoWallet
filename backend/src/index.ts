@@ -154,10 +154,11 @@ app.post('/api/exchange/balances', async (req, res) => {
         const { platform, apiKey, apiSecret, passphrase } = req.body;
 
         // Инициализация биржи через CCXT
-        const exchange = new ccxt[platform]({
+        // Мы приводим ccxt к типу any перед тем, как брать ключ [platform]
+        const exchange = new (ccxt as any)[platform]({
             apiKey: apiKey,
             secret: apiSecret,
-            password: platform === 'okx' ? passphrase : undefined, // Только для OKX
+            password: platform === 'okx' ? passphrase : undefined,
             enableRateLimit: true,
         });
 
