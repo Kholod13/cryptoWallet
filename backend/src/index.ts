@@ -18,7 +18,11 @@ const prisma = new PrismaClient({ adapter });
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
-app.use(cors({origin: 'http://localhost:5173'}));
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production'
+        ? 'https://syncspace-five.vercel.app'
+        : 'http://localhost:5173'
+}));
 app.use(express.json({ limit: '10mb' }));
 
 const authenticateToken = (req: any, res: Response, next: NextFunction) => {
@@ -323,3 +327,5 @@ app.post('/api/wallet/scan', authenticateToken, async (req: any, res: Response) 
 app.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
+
+export default app;
