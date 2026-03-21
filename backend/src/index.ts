@@ -324,8 +324,8 @@ app.post('/api/wallet/scan', authenticateToken, async (req: any, res: Response) 
 
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//     console.log(`🚀 Server running at http://localhost:${PORT}`);
+// });
 
 export default app;

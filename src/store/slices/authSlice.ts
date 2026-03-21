@@ -53,7 +53,7 @@ export const loginUser = createAsyncThunk(
     'auth/login',
     async (userData: any, { rejectWithValue }) => {
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
+            const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
@@ -75,7 +75,7 @@ export const fetchMe = createAsyncThunk('auth/fetchMe', async (_, { rejectWithVa
         const token = localStorage.getItem('token');
         if (!token) return rejectWithValue("No token");
 
-        const response = await fetch('http://localhost:5000/api/auth/me', {
+        const response = await fetch('/api/auth/me', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
@@ -91,7 +91,7 @@ export const fetchMe = createAsyncThunk('auth/fetchMe', async (_, { rejectWithVa
 export const updateProfile = createAsyncThunk('auth/updateProfile', async (updateData: Partial<User>, { rejectWithValue }) => {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/user/update', {
+        const response = await fetch('/api/user/update', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
