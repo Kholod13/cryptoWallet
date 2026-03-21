@@ -154,8 +154,6 @@ app.post('/api/exchange/balances', async (req, res) => {
         const { platform, apiKey, apiSecret, passphrase } = req.body;
 
         // Инициализация биржи через CCXT
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         const exchange = new ccxt[platform]({
             apiKey: apiKey,
             secret: apiSecret,
