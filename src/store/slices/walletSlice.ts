@@ -29,7 +29,7 @@ export const syncExchangeBalances = createAsyncThunk(
     'wallet/syncExchange',
     async (params: { id: string, platform: string, apiKey?: string, apiSecret?: string, passphrase?: string }, { rejectWithValue }) => {
         try {
-            const response = await fetch('http://localhost:5000/api/exchange/balances', {
+            const response = await fetch('/api/exchange/balances', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(params),
@@ -50,7 +50,7 @@ export const fetchSourceBalances = createAsyncThunk(
     async (source: ConnectedSource, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/wallet/scan', {
+            const response = await fetch('/api/wallet/scan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export const fetchUserSources = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/wallets', {
+            const response = await fetch('/api/wallets', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -94,7 +94,7 @@ export const saveSourceToDb = createAsyncThunk(
     async (walletData: ConnectedSource, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/wallets/add', {
+            const response = await fetch('/api/wallets/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ export const deleteSourceFromDb = createAsyncThunk(
     async (walletId: string, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/wallets/${walletId}`, {
+            const response = await fetch(`/api/wallets/${walletId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
