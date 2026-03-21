@@ -1,21 +1,23 @@
 /* eslint-disable */
 import dotenv from 'dotenv';
 import path from 'path';
-import express, {Request, Response, NextFunction} from 'express';
+import express, { Response, NextFunction } from 'express';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+import pg from 'pg';
 import ccxt from "ccxt";
 
 const app = express();
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+// Настройка Prisma для Neon
+dotenv.config();
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
 app.use(cors({
@@ -24,6 +26,7 @@ app.use(cors({
         : 'http://localhost:5173'
 }));
 app.use(express.json({ limit: '10mb' }));
+
 
 const authenticateToken = (req: any, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(' ')[1];
@@ -50,39 +53,19 @@ app.get('/api/auth/ping', (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
-
-        // 1. Проверяем, нет ли уже такого пользователя
         const existingUser = await prisma.user.findFirst({
             where: { OR: [{ email }, { username }] }
         });
+        if (existingUser) return res.status(400).json({ message: "User exists" });
 
-        if (existingUser) {
-            return res.status(400).json({ message: "User with this email or username already exists" });
-        }
-
-        // 2. Хешируем пароль (превращаем "12345" в абракадабру "$2b$10$...")
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        // 3. Сохраняем в базу
         const user = await prisma.user.create({
-            data: {
-                username,
-                email,
-                password: hashedPassword,
-                // Начальные настройки
-                profession: "Crypto Enthusiast",
-                mainCurrency: "USD"
-            }
+            data: { username, email, password: hashedPassword, profession: "Enthusiast", mainCurrency: "USD" }
         });
 
-        // 4. Генерируем токен, чтобы пользователь сразу стал "залогиненным"
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
-
-        // Отправляем данные (кроме пароля!)
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password: _, ...userWithoutPassword } = user;
         res.status(201).json({ user: userWithoutPassword, token });
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
