@@ -46,7 +46,7 @@ export const AppProperties = () => {
 
     return (
         /* 1. ВНЕШНЯЯ ГРАДИЕНТНАЯ РАМКА (p-[1px]) - Возвращена и адаптирована */
-        <div className={`relative p-[1px] rounded-[32px] transition-all duration-500 shadow-2xl h-max w-fit
+        <div className={`relative p-[1px] rounded-[32px] transition-all duration-500 shadow-2xl h-max w-fit z-50
             ${isDark ? 'bg-gradient-to-br from-white/10 to-transparent' : 'bg-gradient-to-br from-slate-200 to-white'}
         `}>
 
