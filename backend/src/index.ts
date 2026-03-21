@@ -1,6 +1,4 @@
 /* eslint-disable */
-import dotenv from 'dotenv';
-import path from 'path';
 import express, { Response, NextFunction } from 'express';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
@@ -12,21 +10,22 @@ import ccxt from "ccxt";
 
 const app = express();
 
-// Настройка Prisma для Neon
-dotenv.config();
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+// Инициализация Prisma (только если есть URL базы)
+const connectionString = process.env.DATABASE_URL;
+let prisma: PrismaClient;
+
+if (connectionString) {
+    const pool = new pg.Pool({ connectionString });
+    const adapter = new PrismaPg(pool);
+    prisma = new PrismaClient({ adapter });
+} else {
+    console.error("DATABASE_URL is missing!");
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
-app.use(cors({
-    origin: process.env.NODE_ENV === 'production'
-        ? 'https://syncspace-five.vercel.app'
-        : 'http://localhost:5173'
-}));
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-
 
 const authenticateToken = (req: any, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(' ')[1];
@@ -39,20 +38,17 @@ const authenticateToken = (req: any, res: Response, next: NextFunction) => {
     });
 };
 
-// Простой ответ на главной странице http://localhost:5000
-app.get('/', (req, res) => {
-    res.send('API is working! Try POST to /api/auth/register');
-});
-
-// Роут для проверки связи
+// ТЕСТОВЫЙ РОУТ (проверь его в браузере: твой-сайт.vercel.app/api/auth/ping)
 app.get('/api/auth/ping', (req, res) => {
-    res.json({ message: 'pong' });
+    res.json({ message: 'pong', database: !!connectionString });
 });
 
-// --- registration route ---
-app.post('/api/auth/register', async (req, res) => {
+// --- РОУТ РЕГИСТРАЦИИ ---
+app.post('/api/auth/register', async (req: any, res: any) => {
     try {
         const { username, email, password } = req.body;
+        if (!prisma) return res.status(500).json({ message: "DB not initialized" });
+
         const existingUser = await prisma.user.findFirst({
             where: { OR: [{ email }, { username }] }
         });
@@ -67,7 +63,7 @@ app.post('/api/auth/register', async (req, res) => {
         const { password: _, ...userWithoutPassword } = user;
         res.status(201).json({ user: userWithoutPassword, token });
     } catch (error) {
-        console.error(error);
+        console.error("Reg Error:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
@@ -306,9 +302,5 @@ app.post('/api/wallet/scan', authenticateToken, async (req: any, res: Response) 
     // }
 
 });
-
-// app.listen(PORT, () => {
-//     console.log(`🚀 Server running at http://localhost:${PORT}`);
-// });
 
 export default app;
