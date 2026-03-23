@@ -77,4 +77,4 @@ This project has undergone a professional **Security Penetration Test** based on
 - **LinkedIn:** https://www.linkedin.com/in/vladyslav-kholod-86647120a/
 - **GitHub:** https://github.com/Kholod13/cryptoWallet
 - **Telegram:** @kah13x
-- **Host:** not released
+- **Host:** https://syncspace-five.vercel.app/
