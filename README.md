@@ -1,80 +1,94 @@
-# 🚀 CryptoWallet — Crypto Portfolio Tracker
+# 🚀 SyncSpace — Fullstack Crypto Portfolio Organizer
 
-**CryptoWallet** is a modern, high-performance web application designed to track and manage cryptocurrency assets. Built with a focus on seamless UX, security, and scalable architecture.
+**SyncSpace** is a comprehensive, high-performance ecosystem designed to consolidate fragmented crypto-assets into a single, interactive dashboard. Unlike simple trackers, SyncSpace offers a full-stack solution with real-time data synchronization across multiple blockchains and exchange accounts.
 
-![React](https://img.shields.io/badge/React-19-blue?logo=react)
-![Redux](https://img.shields.io/badge/Redux-Toolkit-purple?logo=redux)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
-![Tailwind](https://img.shields.io/badge/Tailwind-v4-38B2AC?logo=tailwind-css)
+**Live Demo:** [https://syncspace-five.vercel.app/](https://syncspace-five.vercel.app/)
 
 ---
 
 ## ✨ Features
 
-- **Dashboard Overview:** Visual summary of your crypto holdings and total balance.
-- **Dynamic Asset Roadmap:** An interactive, draggable roadmap of technical goals built with `Framer Motion` and `react-xarrows`.
-- **Global State Management:** Centralized user and UI data handling using `Redux Toolkit`.
-- **User Profile System:** Customizable profile with local image upload (Base64) and persistence via `LocalStorage`.
-- **Advanced UI/UX:**
-    - Glassmorphism design principles.
-    - Smooth Parallax and Reveal scroll effects.
-    - Interactive Sidebar with active route highlighting.
-- **Custom Notification System:** A Redux-based Toast notification system with smooth `Framer Motion` animations.
+### 📊 Advanced Dashboard
+- **Real-time Tracking:** Consolidate balances from multiple wallets and exchanges.
+- **Data Visualization:** Interactive financial charts powered by **Recharts** for deep portfolio analysis.
+- **Dynamic Asset Roadmap:** A draggable, interactive technical roadmap built with **Framer Motion** and **react-xarrows**.
+
+### ⚙️ Fullstack Capabilities
+- **Custom Backend:** Built from scratch to handle complex data aggregation and user management.
+- **Blockchain Integration:** Seamless data fetching from **Moralis**, **Etherscan**, and **CoinGecko APIs**.
+- **Global Ready:** Full multi-language support (English, Czech, Ukrainian) using **i18next**.
+
+### 🎨 Premium UI/UX
+- **Modern Aesthetics:** Built on **Glassmorphism** design principles.
+- **Fluid Motion:** Smooth Parallax and Reveal scroll effects for a tactile feel.
+- **Redux-based Notifications:** A custom Toast notification system with Framer Motion animations.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Frontend:** React (Vite)
+### Frontend
+- **Framework:** React (Vite)
 - **Language:** TypeScript (Strict mode)
-- **State Management:** Redux Toolkit (Slices, Typed Hooks)
+- **State Management:** Redux Toolkit (Typed Hooks & Slices)
 - **Styling:** Tailwind CSS (v4)
 - **Animations:** Framer Motion
 - **Icons:** Lucide React
-- **Routing:** React Router DOM v6
+
+### Backend
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **Database:** PostgreSQL
+- **ORM:** Prisma
+- **Localization:** i18next (i18n)
+
+### DevOps & Tools
+- **Containerization:** Docker (for consistent dev/prod environments)
+- **Version Control:** Git (Git Flow)
+- **API Handling:** Axios with interceptors
 
 ---
 
-## 🏗 Architecture & Patterns
-
-The project follows a clean architectural approach:
-- **Feature-based Folder Structure:** Organized by components, layout, and logic slices.
-- **Custom Hooks:** Typed wrappers for Redux (`useAppDispatch`, `useAppSelector`).
-- **Persistence Layer:** Syncing Redux state with `Web Storage API` for data retention.
-- **Component Composition:** Reusable UI components (Cards, Buttons, Inputs).
+## 🏗 Architecture
+The project implements a clean, modular architecture:
+- **Feature-based structure:** Decoupled logic for components, layouts, and state slices.
+- **Type Safety:** End-to-end typing from database schemas (Prisma) to UI props.
+- **Containerization:** The entire environment is containerized with Docker, ensuring "it works on my machine" reliability.
 
 ---
 
-## 🔒 Security Audit
+## 🔒 Security Audit (OWASP)
+This project is currently undergoing a rigorous professional Security Penetration Test based on the **OWASP WSTG** standard.
 
-This project has undergone a professional **Security Penetration Test** based on the **OWASP WSTG** standard.
-- **Vulnerabilities Found:** 0
-- **Security Level:** High
-- **Key focus:** Clean dependency management, zero-trust input handling, and secure data persistence.
+> [!IMPORTANT]
+> **Audit Status:** 🟡 IN PROGRESS  
+> **Target Standards:** Clean dependency management, zero-trust input handling, and secure data persistence.  
+> *Full results and vulnerability report will be published here upon completion.*
 
 ---
 
 ## 🚀 Getting Started
 
+### Prerequisites
+- Node.js (v18+)
+- Docker & Docker Compose
+
+### Installation
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Kholod13/cryptoWallet.git
-   ```
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-3. **Run development server:**
-    ```bash
-   npm run dev
-    ```
+   cd cryptoWallet
    
----
+2. **Setup environment**
+- Create ```.env``` file in the root and add your database and API keys.
+
+3. **Run with Docker**
+    ```bash
+   docker-compose up --build
+- The app will be availiable at ```http://localhost:5173```
 
 ## 👨‍💻 Author
 **Vladyslav Kholod**
-
-- **LinkedIn:** https://www.linkedin.com/in/vladyslav-kholod-86647120a/
-- **GitHub:** https://github.com/Kholod13/cryptoWallet
-- **Telegram:** @kah13x
-- **Host:** https://syncspace-five.vercel.app/
+- LinkedIn: https://www.linkedin.com/in/vladyslav-kholod-86647120a/
+- GitHub: https://github.com/Kholod13/cryptoWallet
+- Telegram: @kah13x
