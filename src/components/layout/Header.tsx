@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-    Search, Bell, Trophy, UserRoundIcon, CircleHelp, X, Info, ShieldCheck, Key, Lock, Wallet, PieChart
+    /*Search, Bell, Trophy,*/ UserRoundIcon, CircleHelp, X, Info, ShieldCheck, Key, Lock, Wallet, PieChart
 } from 'lucide-react';
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -35,6 +35,7 @@ export const Header = () => {
             </div>
 
             {/* 2. Поиск: скрываем на мобилках (до 768px), оставляем на десктопе */}
+            {/*
             <div className={`
                 hidden md:flex items-center px-4 py-2 gap-3 rounded-2xl w-1/3 transition-all duration-500 border
                 ${isDark ? 'bg-white/5 border-white/10 text-white/75' : 'bg-slate-100 border-slate-200 focus-within:bg-white text-slate-900'}
@@ -46,22 +47,25 @@ export const Header = () => {
                     className="bg-transparent border-none outline-none text-sm w-full placeholder:text-slate-500"
                 />
             </div>
+            */}
 
             {/* 3. Правая часть: кнопки и профиль */}
             <div className="flex items-center gap-2 md:gap-6">
 
                 {/* Кнопки уведомлений: на мобилках оставляем только Bell для экономии места */}
+                {/*
                 <div className="flex items-center gap-1 md:gap-3">
                     <button className={`p-2 md:p-2.5 rounded-xl border transition-all cursor-pointer
                         ${isDark ? 'border-white/10 text-slate-400 hover:text-white' : 'border-slate-200 text-slate-600'}`}>
                         <Bell size={18} />
                     </button>
-                    {/* Кнопка Трофея видна только с планшета */}
+                    {
                     <button className={`hidden sm:block p-2 md:p-2.5 rounded-xl border transition-all cursor-pointer
                         ${isDark ? 'border-white/10 text-slate-400 hover:text-white' : 'border-slate-200 text-slate-600'}`}>
                         <Trophy size={18} />
                     </button>
                 </div>
+                */}
 
                 <div className={`hidden md:block w-[1px] h-8 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
 
