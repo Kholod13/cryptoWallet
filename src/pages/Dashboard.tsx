@@ -3,7 +3,7 @@ import MainBalance from "../components/dashboard/MainBalance.tsx";
 import {useAppSelector, useAppDispatch} from "../store";
 import {useEffect} from "react";
 import AggregatedAssets from "../components/dashboard/AggregatedAssets.tsx";
-import {PnLAnalytics} from "../components/dashboard/PnLAnalytics.tsx";
+//import {PnLAnalytics} from "../components/dashboard/PnLAnalytics.tsx";
 const Dashboard = () => {
     const user = useAppSelector((state) => state.auth.user);
 
@@ -18,7 +18,7 @@ const Dashboard = () => {
         <div className="flex flex-col justify-between gap-5">
             <div className="flex flex-row max-[1250px]:flex-col gap-5 justify-between w-full">
                 <MainBalance />
-                <PnLAnalytics />
+                {/*<PnLAnalytics />*/}
             </div>
             <AggregatedAssets />
             <CoinMarket />
